@@ -12,6 +12,14 @@ load_dotenv()
 # Add the parent directory to the path to import our modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Debug: Check if API key is available
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    st.error("❌ OPENAI_API_KEY not found in environment variables")
+    st.info("Please check your Streamlit Cloud secrets configuration")
+else:
+    st.success(f"✅ OpenAI API key found: {api_key[:20]}...")
+
 from agents.enhanced_analyzer import EnhancedAnalyzer
 from agents.memo_generator import generate_memo
 from agents.pitchdeck_parser import parse_pitch_deck, get_pitch_deck_summary
@@ -102,17 +110,38 @@ def generate_markdown(doc: StructuredCompanyDoc) -> str:
 def handle_company_analysis(company_name: str):
     """Handle company analysis and update session state"""
     try:
+        # Check if API key is available
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            st.error("❌ OPENAI_API_KEY not found. Please check your Streamlit Cloud secrets.")
+            return None, None
+        
         with st.spinner(f"Analyzing {company_name}..."):
+            # Add debug info
+            st.info(f"🔍 Starting analysis for {company_name}...")
+            
             doc = run_full_analysis(company_name)
+            
+            if not doc:
+                st.error("❌ Analysis failed - no document generated")
+                return None, None
+            
             memo = generate_markdown(doc)
+            
+            if not memo or len(memo) < 100:
+                st.error("❌ Memo generation failed - content too short")
+                return None, None
             
             st.session_state.current_company = company_name
             st.session_state.current_doc = doc
             st.session_state.current_memo = memo
             
+            st.success(f"✅ Analysis complete for {company_name}!")
             return doc, memo
+            
     except Exception as e:
-        st.error(f"Error analyzing {company_name}: {str(e)}")
+        st.error(f"❌ Error analyzing {company_name}: {str(e)}")
+        st.info("This might be due to API key issues or network problems.")
         return None, None
 
 def handle_question(query: str, company_name: str):
