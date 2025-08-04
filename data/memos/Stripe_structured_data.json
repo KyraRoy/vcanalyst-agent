@@ -1,0 +1,166 @@
+{
+  "name": "Stripe",
+  "website": "https://stripe.com",
+  "intro": {
+    "text": "Increase authorisation rates, offer local payment methods to boost conversion, and reduce fraud using AI.\nManage flat rate, usage-based, and hybrid pricing models, minimise churn, and automate finance operations.\nLaunch, manage, and scale a commercial card programme without any setup fees.",
+    "bullets": [],
+    "metrics": {},
+    "citations": [
+      {
+        "url": "https://stripe.com/",
+        "snippet": "Increase authorisation rates, offer local payment methods to boost conversion, and reduce fraud using AI.\nManage flat rate, usage-based, and hybrid pricing models, minimise churn, and automate finance",
+        "source_type": "website",
+        "timestamp": "2025-07-28T11:25:47.989397"
+      }
+    ]
+  },
+  "problem": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": [
+      {
+        "url": "https://stripe.com/",
+        "snippet": "Increase authorisation rates, offer local payment methods to boost conversion, and reduce fraud using AI.\nManage flat rate, usage-based, and hybrid pricing models, minimise churn, and automate finance",
+        "source_type": "website",
+        "timestamp": "2025-07-28T11:25:47.989397"
+      }
+    ]
+  },
+  "solution": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": [
+      {
+        "url": "https://stripe.com/",
+        "snippet": "Increase authorisation rates, offer local payment methods to boost conversion, and reduce fraud using AI.\nManage flat rate, usage-based, and hybrid pricing models, minimise churn, and automate finance",
+        "source_type": "website",
+        "timestamp": "2025-07-28T11:25:47.989397"
+      }
+    ]
+  },
+  "product": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": [
+      {
+        "url": "https://stripe.com/",
+        "snippet": "Increase authorisation rates, offer local payment methods to boost conversion, and reduce fraud using AI.\nManage flat rate, usage-based, and hybrid pricing models, minimise churn, and automate finance",
+        "source_type": "website",
+        "timestamp": "2025-07-28T11:25:47.989397"
+      }
+    ]
+  },
+  "business_model": {
+    "text": "Business model appears to be: usage-based",
+    "bullets": [],
+    "metrics": {},
+    "citations": [
+      {
+        "url": "https://stripe.com/",
+        "snippet": "Increase authorisation rates, offer local payment methods to boost conversion, and reduce fraud using AI.\nManage flat rate, usage-based, and hybrid pricing models, minimise churn, and automate finance",
+        "source_type": "website",
+        "timestamp": "2025-07-28T11:25:47.989397"
+      }
+    ]
+  },
+  "traction": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": [
+      {
+        "url": "https://stripe.com/",
+        "snippet": "Increase authorisation rates, offer local payment methods to boost conversion, and reduce fraud using AI.\nManage flat rate, usage-based, and hybrid pricing models, minimise churn, and automate finance",
+        "source_type": "website",
+        "timestamp": "2025-07-28T11:25:47.989397"
+      }
+    ]
+  },
+  "financials": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": []
+  },
+  "market": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": []
+  },
+  "competitors": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": []
+  },
+  "growth_strategy": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": []
+  },
+  "roadmap": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": []
+  },
+  "team": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": [
+      {
+        "url": "https://stripe.com/",
+        "snippet": "Increase authorisation rates, offer local payment methods to boost conversion, and reduce fraud using AI.\nManage flat rate, usage-based, and hybrid pricing models, minimise churn, and automate finance",
+        "source_type": "website",
+        "timestamp": "2025-07-28T11:25:47.989397"
+      }
+    ]
+  },
+  "funding": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": []
+  },
+  "risks": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": []
+  },
+  "moat": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": []
+  },
+  "why_now": {
+    "text": null,
+    "bullets": [],
+    "metrics": {},
+    "citations": []
+  },
+  "contact": null,
+  "missing_fields": [
+    "problem",
+    "solution",
+    "product",
+    "traction",
+    "financials",
+    "market",
+    "competitors",
+    "growth_strategy",
+    "roadmap",
+    "team",
+    "funding",
+    "risks",
+    "moat",
+    "why_now"
+  ]
+}

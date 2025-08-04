@@ -1,0 +1,79 @@
+
+# Canva Investment Memo
+Prepared on Jul 29, 2025
+
+
+
+
+## 2. Problem
+Welcome to /r/startups, the place to discuss startup problems and solutions. Startups are companies that are designed to grow and scale rapidly. Be sure to read and follow all of our rules--we have specific places for common content and requests.
+Long story short, I just started using Canva recently for design
+Have you ever sent out or reviewed by pitch made in Canva? What's your take on it?
+
+
+**Sources:** [website](https://www.reddit.com/r/startups/comments/1exlmwy/using_canva_to_share_pitch_deck_slides/)
+
+
+
+
+
+
+
+
+
+
+
+
+## 7. Team
+The Canva team includes Jennie Rogerson, Monica Silvestre, Christina (CJ) Jones in key leadership roles.
+
+
+**Key Team Members:**
+- Jennie Rogerson — Global Head of People
+- Monica Silvestre — Canva
+- Christina (CJ) Jones — Canva
+- Jason Wilmot — Canva
+- Becky White — Canva
+
+
+
+
+**Sources:** [linkedin](https://au.linkedin.com/in/jennierogerson), [linkedin](https://www.linkedin.com/in/hellomonica), [linkedin](https://au.linkedin.com/in/chrisjonesish), [linkedin](https://www.linkedin.com/in/jasonwilmot11), [linkedin](https://au.linkedin.com/in/uxbeckywhite)
+
+
+
+
+
+
+## 9. Competition
+
+
+
+**Key Competitors:**
+- including Zapier, Meta Ads, Akita, Shopify, and more
+
+
+
+
+**Sources:** [google_search](https://zapier.com/blog/canva-alternatives/), [google_search](https://zapier.com/blog/canva-alternatives/), [google_search](https://visme.co/blog/canva-alternatives/)
+
+
+
+
+
+
+## Missing Information
+The following sections could not be populated with evidence:
+- intro
+- solution
+- product
+- business_model
+- traction
+- financials
+- market
+- growth_strategy
+- roadmap
+- risks
+- moat
+- why_now
+

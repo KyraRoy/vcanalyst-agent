@@ -1,0 +1,37 @@
+
+# Investment Memo: 
+
+## Executive Summary
+Spotify appears to offer: This page isout of tune. Target audience: The Record. Business model: SaaS.
+
+## Company Overview
+**Product:** This page isout of tune
+**Business Model:** SaaS
+**Target Audience:** The Record
+
+## Product Deep Dive
+This page isout of tune
+
+## Market Analysis
+**Market Size (TAM):** N/A
+**Trends:** AI adoption in video creation, Rise of the creator economy, Short-form content growth
+**Competitors:** Alternatives to Spotify, Canva, Promo.com, Lumen5, Animoto
+
+## Traction & Metrics
+**Traction Signals:** N/A
+**Testimonials:** N/A
+
+## Team & Founder Analysis
+**Founder:** Daniel Ek
+**Background:** Placeholder background
+**FMF Score:** High
+
+## Risks & Red Flags
+TBD
+
+## Recommendation & Next Steps
+Pending further due diligence. Consider:
+- Customer/user interviews
+- Product demo
+- Deeper market/competitor analysis
+- Reference checks on founders

@@ -1,0 +1,54 @@
+
+# Stripe Investment Memo
+Prepared on Jul 28, 2025
+
+
+## 1. Introduction
+Increase authorisation rates, offer local payment methods to boost conversion, and reduce fraud using AI.
+Manage flat rate, usage-based, and hybrid pricing models, minimise churn, and automate finance operations.
+Launch, manage, and scale a commercial card programme without any setup fees.
+
+
+**Sources:** [website](https://stripe.com/)
+
+
+
+
+
+
+
+
+
+
+## 5. Business Model
+Business model appears to be: usage-based
+
+
+**Sources:** [website](https://stripe.com/)
+
+
+
+
+
+
+
+
+
+
+## Missing Information
+The following sections could not be populated with evidence:
+- problem
+- solution
+- product
+- traction
+- financials
+- market
+- competitors
+- growth_strategy
+- roadmap
+- team
+- funding
+- risks
+- moat
+- why_now
+
