@@ -100,8 +100,25 @@ def get_section_content(doc: StructuredCompanyDoc, section_name: str) -> str:
 
 def run_full_analysis(company_name: str) -> StructuredCompanyDoc:
     """Run the full analysis pipeline for a company using enhanced analyzer"""
-    analyzer = EnhancedAnalyzer()
-    return analyzer.generate_memo_from_web_research(company_name)
+    try:
+        st.info(f"🔍 Creating EnhancedAnalyzer for {company_name}...")
+        analyzer = EnhancedAnalyzer()
+        
+        st.info(f"🔍 Starting web research for {company_name}...")
+        doc = analyzer.generate_memo_from_web_research(company_name)
+        
+        if not doc:
+            st.error("❌ EnhancedAnalyzer returned None")
+            return None
+            
+        st.info(f"✅ Analysis complete! Generated document with {len(doc.get_populated_sections())} populated sections")
+        return doc
+        
+    except Exception as e:
+        st.error(f"❌ Error in run_full_analysis: {str(e)}")
+        import traceback
+        st.code(traceback.format_exc())
+        return None
 
 def generate_markdown(doc: StructuredCompanyDoc) -> str:
     """Generate markdown from the company document"""

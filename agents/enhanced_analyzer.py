@@ -379,21 +379,36 @@ class EnhancedAnalyzer:
         """
         logger.info(f"Generating memo from web research for {company_name}")
         
-        # Comprehensive web research
-        research_sections = self._comprehensive_web_research(company_name, industry)
-        
-        # If web research failed, generate content using GPT knowledge
-        if not research_sections:
-            logger.info(f"No web research data available for {company_name}, using GPT knowledge")
-            memo_sections = self._generate_memo_from_gpt_knowledge(company_name, industry)
-        else:
-            # Use GPT-4 to synthesize the research into a structured memo
-            memo_sections = self._synthesize_research_to_memo(research_sections, company_name)
-        
-        # Create comprehensive company document
-        company_doc = self._create_comprehensive_memo_from_research(memo_sections, company_name)
-        
-        return company_doc
+        try:
+            # Comprehensive web research
+            logger.info(f"Starting comprehensive web research for {company_name}")
+            research_sections = self._comprehensive_web_research(company_name, industry)
+            
+            # If web research failed, generate content using GPT knowledge
+            if not research_sections:
+                logger.info(f"No web research data available for {company_name}, using GPT knowledge")
+                memo_sections = self._generate_memo_from_gpt_knowledge(company_name, industry)
+            else:
+                # Use GPT-4 to synthesize the research into a structured memo
+                logger.info(f"Web research successful, synthesizing with GPT for {company_name}")
+                memo_sections = self._synthesize_research_to_memo(research_sections, company_name)
+            
+            if not memo_sections:
+                logger.error(f"No memo sections generated for {company_name}")
+                return None
+            
+            # Create comprehensive company document
+            logger.info(f"Creating company document for {company_name}")
+            company_doc = self._create_comprehensive_memo_from_research(memo_sections, company_name)
+            
+            logger.info(f"Successfully generated memo for {company_name}")
+            return company_doc
+            
+        except Exception as e:
+            logger.error(f"Error generating memo for {company_name}: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return None
     
     def _comprehensive_web_research(self, company_name: str, industry: str = None) -> Dict:
         """
@@ -771,6 +786,7 @@ class EnhancedAnalyzer:
             from openai import OpenAI
             client = OpenAI(api_key=self.api_key)
             
+            logger.info(f"Making OpenAI API call for {company_name}")
             response = client.chat.completions.create(
                 model="gpt-4-turbo",
                 messages=[
@@ -788,8 +804,14 @@ class EnhancedAnalyzer:
             )
             
             content = response.choices[0].message.content.strip()
-            return self._parse_gpt_response(content, company_name)
+            logger.info(f"OpenAI API call successful for {company_name}, response length: {len(content)}")
+            
+            result = self._parse_gpt_response(content, company_name)
+            logger.info(f"Parsed GPT response for {company_name}, got {len(result)} sections")
+            return result
             
         except Exception as e:
-            logger.error(f"GPT knowledge generation failed: {e}")
+            logger.error(f"GPT knowledge generation failed for {company_name}: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
             return {} 
