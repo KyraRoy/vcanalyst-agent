@@ -17,7 +17,6 @@ class EnhancedAnalyzer:
         if not self.api_key:
             raise ValueError("OPENAI_API_KEY not found in environment variables")
         
-        openai.api_key = self.api_key
         self.scraper = WebScraper()
     
     def analyze_pitch_deck_with_gpt(self, slides_data: List[Dict], company_name: str) -> Dict[str, Section]:

@@ -4,14 +4,14 @@ import logging
 import time
 from typing import List, Dict, Optional
 from datetime import datetime
-import openai
+from openai import OpenAI
 from models.schemas import RawDoc, Section, Citation
 
 logger = logging.getLogger(__name__)
 
 # Load OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
-if not openai.api_key:
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
     logger.warning("OPENAI_API_KEY not found in environment variables")
 
 def chunk_text(text: str, max_chunk_size: int = 4000) -> List[str]:
@@ -83,7 +83,8 @@ def extract_from_chunk(company_name: str, chunk: Dict, max_retries: int = 3) -> 
         
         for attempt in range(max_retries):
             try:
-                response = openai.ChatCompletion.create(
+                client = OpenAI(api_key=api_key)
+                response = client.chat.completions.create(
                     model="gpt-4-turbo",
                     messages=[
                         {
@@ -203,7 +204,7 @@ def extract_sections_with_gpt(company_name: str, raw_docs: List[RawDoc]) -> Dict
     Returns:
         Dictionary mapping section names to Section objects
     """
-    if not openai.api_key:
+    if not api_key:
         logger.error("OPENAI_API_KEY not found. Cannot perform GPT-4 extraction.")
         return {}
     
