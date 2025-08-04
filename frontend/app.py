@@ -260,7 +260,10 @@ def main():
     
     # Process button
     if st.button("🚀 Process", type="primary", use_container_width=True):
+        st.info("🔄 Process button clicked! Starting analysis...")
+        
         if uploaded_file:
+            st.info("📄 Processing uploaded pitch deck...")
             # Process pitch deck
             doc, memo = process_pitch_deck(uploaded_file)
             if doc and memo:
@@ -277,6 +280,7 @@ def main():
                 st.rerun()
         
         elif user_input:
+            st.info(f"💬 Processing text input: '{user_input}'")
             # Process text input
             st.session_state.chat_history.append({
                 "role": "user",
@@ -285,8 +289,10 @@ def main():
             
             # Extract company name
             company_name = extract_company_name(user_input)
+            st.info(f"🏢 Extracted company name: '{company_name}'")
             
             if company_name:
+                st.info(f"🔍 Starting analysis for {company_name}...")
                 # Analyze company
                 doc, memo = handle_company_analysis(company_name)
                 if doc and memo:
@@ -298,17 +304,8 @@ def main():
                     st.success(f"✅ Analysis complete for {company_name}!")
                     st.rerun()
             else:
-                # Handle general questions
-                if st.session_state.current_company:
-                    response = handle_question(user_input, st.session_state.current_company)
-                    st.session_state.chat_history.append({
-                        "role": "assistant",
-                        "content": response
-                    })
-                    st.rerun()
-                else:
-                    st.error("Please specify a company name or upload a pitch deck first.")
-                    st.rerun()
+                st.error("❌ Could not extract company name from input")
+                st.rerun()
         else:
             st.warning("Please upload a file or enter a question.")
             st.rerun()
@@ -318,7 +315,7 @@ def main():
         st.markdown("---")
         st.markdown("**Quick Actions:**")
         
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             if st.button("📊 Show Memo", use_container_width=True):
@@ -343,6 +340,22 @@ def main():
                 st.session_state.current_memo = None
                 st.session_state.current_doc = None
                 st.rerun()
+        
+        with col4:
+            if st.button("🧪 Test API", use_container_width=True):
+                st.info("🧪 Testing OpenAI API...")
+                try:
+                    from openai import OpenAI
+                    client = OpenAI(api_key=api_key)
+                    response = client.chat.completions.create(
+                        model="gpt-4-turbo",
+                        messages=[{"role": "user", "content": "Say 'API test successful!'"}],
+                        max_tokens=50
+                    )
+                    result = response.choices[0].message.content.strip()
+                    st.success(f"✅ API test successful! Response: {result}")
+                except Exception as e:
+                    st.error(f"❌ API test failed: {str(e)}")
     
     # Instructions
     st.markdown("---")
