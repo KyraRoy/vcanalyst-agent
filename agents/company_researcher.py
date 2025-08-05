@@ -394,32 +394,36 @@ class CompanyResearcher:
     
     def create_verifiable_memo(self, company_name: str) -> StructuredCompanyDoc:
         """
-        Create a verifiable investment memo based on real sources only.
+        Create a memo using GPT knowledge first, then enhance with web research.
         """
-        logger.info(f"Creating verifiable memo for {company_name}")
-        
-        # Step 1: Search for verifiable sources
-        sources = self.search_verifiable_sources(company_name)
-        
-        if not sources:
-            logger.warning(f"No verifiable sources found for {company_name}")
-            return self._create_insufficient_data_memo(company_name)
-        
-        # Step 2: Extract structured data from sources
-        structured_data = extract_structured_data_from_sources(sources, company_name)
-        
-        if not structured_data:
-            logger.warning(f"No structured data could be extracted for {company_name}")
-            return self._create_insufficient_data_memo(company_name)
-        
-        # Step 3: Create structured company document
-        company_doc = StructuredCompanyDoc(name=company_name)
-        
-        # Map structured data to memo sections
-        self._map_data_to_sections(company_doc, structured_data, sources)
-        
-        logger.info(f"Verifiable memo created for {company_name}")
-        return company_doc
+        try:
+            # Step 1: Get base information from GPT knowledge
+            logger.info(f"Getting GPT knowledge for {company_name}...")
+            company_doc = self._generate_memo_from_gpt_knowledge(company_name)
+            
+            # Step 2: Enhance with web research if available
+            logger.info(f"Enhancing with web research for {company_name}...")
+            sources = self.search_verifiable_sources(company_name)
+            
+            if sources and len(sources) > 0:
+                # Extract additional data from web sources
+                web_data = extract_structured_data_from_sources(sources, company_name)
+                
+                if web_data and any(web_data.values()):
+                    # Enhance the existing document with web data
+                    self._enhance_document_with_web_data(company_doc, web_data, sources)
+                    logger.info(f"Enhanced memo with web research for {company_name}")
+                else:
+                    logger.info(f"No additional web data found for {company_name}")
+            else:
+                logger.info(f"No web sources found for {company_name}, using GPT knowledge only")
+            
+            return company_doc
+            
+        except Exception as e:
+            logger.error(f"Failed to create memo for {company_name}: {e}")
+            # Fallback to GPT knowledge only
+            return self._generate_memo_from_gpt_knowledge(company_name)
     
     def _create_insufficient_data_memo(self, company_name: str) -> StructuredCompanyDoc:
         """Create a memo indicating insufficient public data"""
@@ -455,13 +459,24 @@ class CompanyResearcher:
     def _map_data_to_sections(self, company_doc: StructuredCompanyDoc, data: Dict, sources: List[Dict]):
         """Map extracted data to memo sections with proper citations and natural language summaries"""
         
-        # Create citations from sources
+        # Create citations from sources or GPT knowledge
         citations = []
-        for source in sources:
+        if sources:
+            # Use real sources
+            for source in sources:
+                citation = Citation(
+                    source_type=self._determine_source_type(source.get('url', '')),
+                    url=source.get('url', ''),
+                    title=source.get('title', ''),
+                    timestamp=datetime.now()
+                )
+                citations.append(citation)
+        else:
+            # Use GPT knowledge citation
             citation = Citation(
-                source_type=self._determine_source_type(source.get('url', '')),
-                url=source.get('url', ''),
-                title=source.get('title', ''),
+                source_type="gpt_knowledge",
+                url="https://gpt-knowledge.com",
+                title="GPT Training Data",
                 timestamp=datetime.now()
             )
             citations.append(citation)
@@ -608,6 +623,78 @@ class CompanyResearcher:
                     citations=citations
                 )
     
+    def _enhance_document_with_web_data(self, company_doc: StructuredCompanyDoc, web_data: Dict, sources: List[Dict]):
+        """Enhance the existing document with additional data from web sources."""
+        # Create citations for web sources
+        web_citations = []
+        for source in sources:
+            citation = Citation(
+                source_type=self._determine_source_type(source.get('url', '')),
+                url=source.get('url', ''),
+                title=source.get('title', ''),
+                timestamp=datetime.now()
+            )
+            web_citations.append(citation)
+
+        # Add new sections if they are not already present
+        if 'team' not in company_doc or not company_doc.team:
+            team_text = ""
+            if web_data.get('team'):
+                if web_data['team'].get('founders'):
+                    team_text += f"Founders: {', '.join(web_data['team']['founders'])}. "
+                if web_data['team'].get('team_members'):
+                    team_text += f"Team members: {', '.join(web_data['team']['team_members'])}"
+            
+            if team_text:
+                company_doc.team = Section(
+                    text=team_text,
+                    bullets=web_data['team'].get('founders', []),
+                    citations=web_citations
+                )
+
+        if 'product' not in company_doc or not company_doc.product:
+            product_text = ""
+            if web_data.get('product'):
+                if web_data['product'].get('description'):
+                    product_text += f"{web_data['product']['description']}. "
+                if web_data['product'].get('problem_solved'):
+                    product_text += f"Problem solved: {web_data['product']['problem_solved']}"
+            
+            if product_text:
+                company_doc.product = Section(
+                    text=product_text,
+                    bullets=web_data['product'].get('features', []),
+                    citations=web_citations
+                )
+
+        if 'competitors' not in company_doc or not company_doc.competitors:
+            competitors_text = ""
+            if web_data.get('competitors'):
+                if web_data['competitors'].get('market_position'):
+                    competitors_text += f"Market position: {web_data['competitors']['market_position']}. "
+            
+            if competitors_text:
+                company_doc.competitors = Section(
+                    text=competitors_text,
+                    bullets=web_data['competitors'].get('mentioned_competitors', []),
+                    citations=web_citations
+                )
+
+        if 'financials' not in company_doc or not company_doc.financials:
+            funding_text = ""
+            if web_data.get('funding'):
+                if web_data['funding'].get('total_raised'):
+                    funding_text += f"Total raised: {web_data['funding']['total_raised']}. "
+                if web_data['funding'].get('latest_round'):
+                    funding_text += f"Latest round: {web_data['funding']['latest_round']}"
+            
+            if funding_text:
+                company_doc.financials = Section(
+                    text=funding_text,
+                    bullets=web_data['funding'].get('investors', []),
+                    citations=web_citations
+                )
+    
     def _determine_source_type(self, url: str) -> str:
         """Determine the source type based on URL"""
         url_lower = url.lower()
@@ -685,3 +772,122 @@ class CompanyResearcher:
         logger.info(f"Pitch deck analysis complete. Found {len(company_doc.get_populated_sections())} populated sections.")
         
         return company_doc
+
+    def _generate_memo_from_gpt_knowledge(self, company_name: str) -> StructuredCompanyDoc:
+        """
+        Generate memo using GPT's internal knowledge when web research fails.
+        This mimics ChatGPT's ability to provide information from its training data.
+        """
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            
+            prompt = f"""
+            You are a professional VC analyst. Provide comprehensive information about {company_name} based on your training data.
+            
+            CRITICAL RULES:
+            1. Only provide information you are confident about from your training data
+            2. If you don't have reliable information, say "Limited information available"
+            3. Be honest about what you know vs. what you don't know
+            4. Focus on factual, verifiable information
+            5. Include specific details when available
+            6. Provide comprehensive analysis like ChatGPT would
+            7. Include market context, industry trends, and competitive landscape
+            8. Be detailed and informative, not just basic facts
+            
+            Please provide comprehensive information about {company_name} in the following JSON format:
+            {{
+                "company_description": {{
+                    "official_description": "Detailed description of what the company does",
+                    "mission_statement": "Company mission and vision (if known)",
+                    "website_url": "Official website (if known)"
+                }},
+                "team": {{
+                    "founders": ["Real founder names if known"],
+                    "team_members": ["Real team members if known"],
+                    "backgrounds": ["Real backgrounds and expertise if known"],
+                    "linkedin_urls": ["Real LinkedIn URLs if known"]
+                }},
+                "product": {{
+                    "description": "Detailed description of what the product does",
+                    "problem_solved": "Specific problem they solve and market need",
+                    "features": ["Key features and capabilities"],
+                    "target_users": "Who the product is for and use cases"
+                }},
+                "funding": {{
+                    "total_raised": "Real funding amount if known",
+                    "latest_round": "Latest round details if known",
+                    "investors": ["Real investors if known"],
+                    "funding_status": "Funding status and valuation if known"
+                }},
+                "partnerships": {{
+                    "partners": ["Real partners if known"],
+                    "partnerships": ["Real partnerships if known"]
+                }},
+                "competitors": {{
+                    "mentioned_competitors": ["Direct competitors if known"],
+                    "implied_competitors": ["Indirect competitors if known"],
+                    "market_position": "How company positions itself in the market"
+                }},
+                "social_media": {{
+                    "linkedin": "LinkedIn page if known",
+                    "twitter": "Twitter handle if known",
+                    "website": "Official website if known"
+                }},
+                "data_quality": {{
+                    "verification_level": "gpt_knowledge",
+                    "missing_information": ["List of information not available"],
+                    "sources_used": ["GPT training data"],
+                    "fake_data_detected": "no"
+                }}
+            }}
+            
+            IMPORTANT: 
+            - Provide comprehensive, detailed information like ChatGPT would
+            - Include market context, industry analysis, and competitive landscape
+            - Be specific about what you know and what you don't know
+            - Focus on providing valuable insights for investment analysis
+            """
+            
+            response = client.chat.completions.create(
+                model="gpt-4-turbo",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a professional VC analyst. Provide accurate information from your training data. Be honest about what you know and what you don't know."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                temperature=0.1,
+                max_tokens=2000
+            )
+            
+            content = response.choices[0].message.content.strip()
+            
+            # Parse JSON response
+            import json
+            try:
+                data = json.loads(content)
+                
+                # Detect and clean fake data
+                data = detect_fake_data(data)
+                
+                # Create company document
+                company_doc = StructuredCompanyDoc(name=company_name)
+                
+                # Map data to sections
+                self._map_data_to_sections(company_doc, data, [])
+                
+                logger.info(f"Successfully generated memo from GPT knowledge for {company_name}")
+                return company_doc
+                
+            except json.JSONDecodeError:
+                logger.error(f"Failed to parse GPT knowledge response for {company_name}")
+                return self._create_insufficient_data_memo(company_name)
+                
+        except Exception as e:
+            logger.error(f"Failed to generate memo from GPT knowledge for {company_name}: {e}")
+            return self._create_insufficient_data_memo(company_name)

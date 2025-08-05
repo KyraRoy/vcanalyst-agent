@@ -27,7 +27,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.recommendations.citations %}
-**Sources:** {% for citation in company.recommendations.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.recommendations.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ---
@@ -46,7 +46,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.intro.citations %}
-**Sources:** {% for citation in company.intro.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.intro.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 2. Company Overview
@@ -63,7 +63,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.intro.citations %}
-**Sources:** {% for citation in company.intro.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.intro.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 3. Problem
@@ -80,7 +80,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.problem.citations %}
-**Sources:** {% for citation in company.problem.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.problem.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 4. Solution
@@ -97,7 +97,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.solution.citations %}
-**Sources:** {% for citation in company.solution.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.solution.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 5. Product
@@ -114,7 +114,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.product.citations %}
-**Sources:** {% for citation in company.product.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.product.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 6. Business Model
@@ -131,7 +131,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.business_model.citations %}
-**Sources:** {% for citation in company.business_model.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.business_model.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 7. Market Size
@@ -148,7 +148,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.market.citations %}
-**Sources:** {% for citation in company.market.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.market.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 8. Traction
@@ -165,7 +165,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.traction.citations %}
-**Sources:** {% for citation in company.traction.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.traction.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 9. Growth Strategy
@@ -182,7 +182,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.growth_strategy.citations %}
-**Sources:** {% for citation in company.growth_strategy.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.growth_strategy.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 10. Team
@@ -199,7 +199,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.team.citations %}
-**Sources:** {% for citation in company.team.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.team.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 11. Competition
@@ -216,7 +216,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.competitors.citations %}
-**Sources:** {% for citation in company.competitors.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.competitors.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 12. Financials
@@ -233,7 +233,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.financials.citations %}
-**Sources:** {% for citation in company.financials.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.financials.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 13. Risks
@@ -250,7 +250,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.risks.citations %}
-**Sources:** {% for citation in company.risks.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.risks.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 14. Timing
@@ -267,7 +267,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.timing.citations %}
-**Sources:** {% for citation in company.timing.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.timing.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 15. Moat
@@ -284,7 +284,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.moat.citations %}
-**Sources:** {% for citation in company.moat.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.moat.citations %}{% if citation.source_type == "gpt_knowledge" %}GPT Training Data{% else %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 """
 
