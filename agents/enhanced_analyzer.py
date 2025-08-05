@@ -368,47 +368,67 @@ class EnhancedAnalyzer:
 
     def generate_memo_from_web_research(self, company_name: str, industry: str = None) -> StructuredCompanyDoc:
         """
-        Generate a comprehensive investment memo using only web research when no pitch deck is available.
+        Generate a comprehensive investment memo from web research only.
         
         Args:
             company_name: Name of the company
             industry: Industry sector (optional)
             
         Returns:
-            StructuredCompanyDoc with comprehensive analysis
+            StructuredCompanyDoc with complete memo
         """
-        logger.info(f"Generating memo from web research for {company_name}")
+        logger.info(f"Starting web research memo generation for {company_name}")
         
         try:
-            # Comprehensive web research
-            logger.info(f"Starting comprehensive web research for {company_name}")
-            research_sections = self._comprehensive_web_research(company_name, industry)
+            # Add timeout wrapper to prevent infinite hanging
+            import signal
             
-            # If web research failed, generate content using GPT knowledge
-            if not research_sections:
-                logger.info(f"No web research data available for {company_name}, using GPT knowledge")
+            def timeout_handler(signum, frame):
+                raise TimeoutError(f"Analysis timed out for {company_name}")
+            
+            # Set 3-minute timeout
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(180)  # 3 minutes
+            
+            try:
+                # Perform comprehensive web research
+                research_data = self._comprehensive_web_research(company_name, industry)
+                
+                if not research_data:
+                    logger.warning(f"No web research data found for {company_name}, falling back to GPT knowledge")
+                    # Fallback to GPT knowledge
+                    memo_sections = self._generate_memo_from_gpt_knowledge(company_name, industry)
+                else:
+                    # Synthesize research into memo sections
+                    memo_sections = self._synthesize_research_to_memo(research_data, company_name)
+                
+                # Create comprehensive memo
+                memo = self._create_comprehensive_memo_from_research(memo_sections, company_name)
+                
+                signal.alarm(0)  # Cancel timeout
+                logger.info(f"Successfully generated memo for {company_name}")
+                return memo
+                
+            except TimeoutError as e:
+                logger.error(f"Analysis timed out for {company_name}: {e}")
+                # Fallback to GPT knowledge
                 memo_sections = self._generate_memo_from_gpt_knowledge(company_name, industry)
-            else:
-                # Use GPT-4 to synthesize the research into a structured memo
-                logger.info(f"Web research successful, synthesizing with GPT for {company_name}")
-                memo_sections = self._synthesize_research_to_memo(research_sections, company_name)
-            
-            if not memo_sections:
-                logger.error(f"No memo sections generated for {company_name}")
-                return None
-            
-            # Create comprehensive company document
-            logger.info(f"Creating company document for {company_name}")
-            company_doc = self._create_comprehensive_memo_from_research(memo_sections, company_name)
-            
-            logger.info(f"Successfully generated memo for {company_name}")
-            return company_doc
-            
+                memo = self._create_comprehensive_memo_from_research(memo_sections, company_name)
+                return memo
+                
+            except Exception as e:
+                logger.error(f"Web research failed for {company_name}: {e}")
+                # Fallback to GPT knowledge
+                memo_sections = self._generate_memo_from_gpt_knowledge(company_name, industry)
+                memo = self._create_comprehensive_memo_from_research(memo_sections, company_name)
+                return memo
+                
         except Exception as e:
-            logger.error(f"Error generating memo for {company_name}: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
-            return None
+            logger.error(f"Unexpected error in memo generation for {company_name}: {e}")
+            # Final fallback
+            memo_sections = self._generate_memo_from_gpt_knowledge(company_name, industry)
+            memo = self._create_comprehensive_memo_from_research(memo_sections, company_name)
+            return memo
     
     def _comprehensive_web_research(self, company_name: str, industry: str = None) -> Dict:
         """
@@ -421,76 +441,70 @@ class EnhancedAnalyzer:
         Returns:
             Dictionary of research data
         """
-        logger.info(f"Performing comprehensive web research for {company_name}")
+        logger.info(f"Starting web research for {company_name}")
         
-        # Define comprehensive search queries
+        # Define comprehensive search queries (LIMITED to prevent hanging)
         search_queries = [
-            # Company overview
+            # Company overview (most important)
             f"{company_name} company overview",
             f"{company_name} about us",
-            f"{company_name} mission vision",
             
             # Problem and solution
             f"{company_name} problem solution",
             f"{company_name} what problem does it solve",
-            f"{company_name} value proposition",
-            
-            # Product and features
-            f"{company_name} product features",
-            f"{company_name} platform technology",
-            f"{company_name} how it works",
             
             # Business model
             f"{company_name} business model",
             f"{company_name} revenue model",
-            f"{company_name} pricing",
             
             # Market and opportunity
             f"{company_name} market size",
-            f"{company_name} TAM SAM SOM",
             f"{industry} market size 2024" if industry else f"{company_name} industry market size",
             
             # Traction and metrics
             f"{company_name} revenue growth",
-            f"{company_name} user metrics",
             f"{company_name} funding raised",
             
             # Team and founders
             f"{company_name} founders team",
             f"{company_name} CEO CTO",
-            f"{company_name} leadership",
             
             # Competition
             f"{company_name} competitors",
             f"{company_name} competitive landscape",
-            f"{company_name} vs competitors",
             
             # Financials
             f"{company_name} financials",
             f"{company_name} funding rounds",
-            f"{company_name} valuation",
             
             # Growth strategy
             f"{company_name} growth strategy",
             f"{company_name} expansion plans",
-            f"{company_name} go-to-market",
             
             # Industry insights
             f"{industry} trends 2024" if industry else f"{company_name} industry trends",
-            f"{industry} growth rate" if industry else f"{company_name} market growth",
             f"McKinsey {industry} report" if industry else f"McKinsey {company_name} industry report"
         ]
         
-        # Perform web searches
+        # LIMIT to 10 queries to prevent hanging
+        limited_queries = search_queries[:10]
+        logger.info(f"Processing {len(limited_queries)} search queries for {company_name}")
+        
+        # Perform web searches with timeout
         research_data = {}
-        for query in search_queries:
+        for i, query in enumerate(limited_queries):
             try:
+                logger.info(f"Searching query {i+1}/{len(limited_queries)}: {query}")
                 results = search_google(company_name, [query])
                 if results:
                     research_data[query] = results
+                    logger.info(f"Found {len(results)} results for query: {query}")
+                else:
+                    logger.warning(f"No results found for query: {query}")
             except Exception as e:
                 logger.warning(f"Web search failed for query '{query}': {e}")
         
+        logger.info(f"Completed web research for {company_name}: {len(research_data)} successful queries")
         return research_data
     
     def _synthesize_research_to_memo(self, research_data: Dict, company_name: str) -> Dict[str, Section]:
