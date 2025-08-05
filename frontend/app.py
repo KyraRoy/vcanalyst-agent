@@ -20,7 +20,7 @@ if not api_key:
 else:
     st.success(f"✅ OpenAI API key found: {api_key[:20]}...")
 
-from agents.enhanced_analyzer import EnhancedAnalyzer
+from agents.company_researcher import CompanyResearcher
 from agents.memo_generator import generate_memo
 from agents.pitchdeck_parser import parse_pitch_deck, get_pitch_deck_summary
 from models.schemas import StructuredCompanyDoc
@@ -99,16 +99,16 @@ def get_section_content(doc: StructuredCompanyDoc, section_name: str) -> str:
     return "\n".join(content)
 
 def run_full_analysis(company_name: str) -> StructuredCompanyDoc:
-    """Run the full analysis pipeline for a company using enhanced analyzer"""
+    """Run the full analysis pipeline for a company using CompanyResearcher"""
     try:
-        st.info(f"🔍 Creating EnhancedAnalyzer for {company_name}...")
-        analyzer = EnhancedAnalyzer()
+        st.info(f"🔍 Creating CompanyResearcher for {company_name}...")
+        researcher = CompanyResearcher()
         
         st.info(f"🔍 Starting web research for {company_name}...")
-        doc = analyzer.generate_memo_from_web_research(company_name)
+        doc = researcher.analyze_company(company_name)
         
         if not doc:
-            st.error("❌ EnhancedAnalyzer returned None")
+            st.error("❌ CompanyResearcher returned None")
             return None
             
         st.info(f"✅ Analysis complete! Generated document with {len(doc.get_populated_sections())} populated sections")
