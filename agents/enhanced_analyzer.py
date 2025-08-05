@@ -807,92 +807,101 @@ class EnhancedAnalyzer:
         You are a professional VC research analyst conducting comprehensive due diligence on {company_name}. 
         Your task is to research and analyze this company using your knowledge to create a detailed investment memo.
         
+        IMPORTANT: This is likely an early-stage startup with limited public information. Focus on:
+        - What the company does (if known)
+        - Market opportunity and problem they solve
+        - Team background (if any founders are known)
+        - Technology/product approach
+        - Competitive landscape
+        - Investment potential for early-stage investors
+        
         For each section below, provide the actual answer to the specific question, not the question itself.
-        Do NOT use generic templates or placeholder text. Get actual insights and facts.
+        Do NOT use generic templates or placeholder text. If information is limited, be honest about it.
         
         Return the analysis as a JSON object with this structure:
         {{
             "recommendations": {{
-                "text": "Provide a comprehensive investment recommendation for {company_name} based on the 4 key parameters: Speed (10x faster execution), Depth (domain expertise), Taste (intuition and decision quality), and Influence (attention and positioning). Be brutally honest about whether we should invest and why. Answer in 200+ words with specific reasoning.",
+                "text": "Provide a comprehensive investment recommendation for {company_name} based on the 4 key parameters: Speed (execution capability), Depth (domain expertise), Taste (decision quality), and Influence (market positioning). For early-stage startups, focus on potential rather than proven track record. Be honest about what we know vs. what we don't know. Answer in 200+ words with specific reasoning.",
                 "bullets": [
-                    "Should we invest? [Yes/No] with reasoning on Speed, Depth, Taste, Influence",
+                    "Should we invest? [Yes/No/Maybe] with reasoning for early-stage context",
                     "Key questions to ask founders to validate investment thesis",
                     "Red flags and risks to watch out for (be brutally honest)",
-                    "SWOT analysis of investing in this company"
+                    "SWOT analysis of investing in this early-stage company"
                 ]
             }},
             "executive_summary": {{
-                "text": "Provide a comprehensive overview of {company_name} including their mission, current status, and funding history. Answer in 150+ words with specific details.",
-                "bullets": ["List the 5 most important facts about {company_name} that investors should know with specific details."]
+                "text": "Provide a comprehensive overview of {company_name} including their mission, what they do, and any known status. For early-stage startups, focus on the problem they solve and their approach. Answer in 150+ words with specific details.",
+                "bullets": ["List the 5 most important facts about {company_name} that early-stage investors should know."]
             }},
             "company_overview": {{
-                "text": "Describe the founding story and history of {company_name} including founding year, founders, headquarters, and key milestones. Answer in 150+ words with specific dates and facts.",
-                "bullets": ["List 5 key milestones and achievements in {company_name} history with specific dates."]
+                "text": "Describe what we know about {company_name} including founding story, founders (if known), and any key milestones. For early-stage startups, focus on the founding vision and early progress. Answer in 150+ words with specific details.",
+                "bullets": ["List 5 key points about {company_name} founding and early development."]
             }},
             "problem": {{
-                "text": "Describe the specific problem that {company_name} solves, who are the people or businesses affected, and the pain points and market gaps. Answer in 150+ words with concrete examples.",
+                "text": "Describe the specific problem that {company_name} solves, who are the people or businesses affected, and the pain points and market gaps. For early-stage startups, focus on the market opportunity. Answer in 150+ words with concrete examples.",
                 "bullets": ["List the 5 biggest pain points that {company_name} addresses with specific details about the problems."]
             }},
             "solution": {{
-                "text": "Explain how {company_name} solves the problem, their unique approach and value proposition. Describe their solution in detail. Answer in 150+ words with specific features and benefits.",
+                "text": "Explain how {company_name} solves the problem, their unique approach and value proposition. Describe their solution in detail. For early-stage startups, focus on the innovation and approach. Answer in 150+ words with specific features and benefits.",
                 "bullets": ["List the 5 key features or benefits of {company_name} solution with specific details about what makes them unique."]
             }},
             "product": {{
-                "text": "Describe {company_name} product or service, how it works, the technology, features, and user experience. Answer in 150+ words with technical details.",
+                "text": "Describe {company_name} product or service, how it works, the technology, features, and user experience. For early-stage startups, focus on the core product and technology approach. Answer in 150+ words with technical details.",
                 "bullets": ["List the 5 most important features of {company_name} product with specific functionality details."]
             }},
             "business_model": {{
-                "text": "Explain how {company_name} makes money, their revenue model, pricing strategy, and monetization approach. Answer in 150+ words with specific numbers and strategies.",
+                "text": "Explain how {company_name} plans to make money, their revenue model, pricing strategy, and monetization approach. For early-stage startups, focus on the planned business model. Answer in 150+ words with specific strategies.",
                 "bullets": ["List the 5 key revenue streams or pricing strategies for {company_name} with specific details."]
             }},
             "market_size": {{
-                "text": "Describe the market size and opportunity for {company_name} including TAM, SAM, SOM data, growth rates, and market trends. Answer in 150+ words with specific numbers.",
+                "text": "Describe the market size and opportunity for {company_name} including TAM, SAM, SOM data, growth rates, and market trends. For early-stage startups, focus on the market opportunity and growth potential. Answer in 150+ words with specific numbers.",
                 "bullets": ["List the 5 key market insights for {company_name} industry with specific market data and trends."]
             }},
             "traction": {{
-                "text": "Describe {company_name} current traction and growth metrics including user numbers, revenue, partnerships, and expansion data. Answer in 150+ words with specific numbers.",
-                "bullets": ["List the 5 most impressive traction metrics for {company_name} with specific numbers and growth rates."]
+                "text": "Describe {company_name} current traction and progress including any known metrics, partnerships, or early signs of product-market fit. For early-stage startups, focus on early indicators rather than established metrics. Answer in 150+ words with specific details.",
+                "bullets": ["List the 5 most promising early indicators for {company_name} with specific details."]
             }},
             "growth_strategy": {{
-                "text": "Describe {company_name} growth strategy and go-to-market approach, how they acquire customers and expand. Answer in 150+ words with specific tactics.",
+                "text": "Describe {company_name} growth strategy and go-to-market approach, how they plan to acquire customers and expand. For early-stage startups, focus on the planned approach and market entry strategy. Answer in 150+ words with specific tactics.",
                 "bullets": ["List the 5 key growth strategies for {company_name} with specific customer acquisition tactics."]
             }},
             "team": {{
-                "text": "Describe the key team members and founders of {company_name}, their backgrounds and prior successes. Answer in 150+ words with specific details about leadership.",
+                "text": "Describe the key team members and founders of {company_name}, their backgrounds and prior experience. For early-stage startups, focus on founder backgrounds and relevant experience. Answer in 150+ words with specific details about leadership.",
                 "bullets": ["List the 5 most important team members at {company_name} with their roles and backgrounds."]
             }},
             "competitors": {{
-                "text": "Describe {company_name} main competitors, how they differentiate themselves, and the competitive landscape. Answer in 150+ words with specific company names.",
+                "text": "Describe {company_name} main competitors, how they differentiate themselves, and the competitive landscape. For early-stage startups, focus on the competitive positioning and differentiation. Answer in 150+ words with specific company names.",
                 "bullets": ["List the 5 main competitors of {company_name} with how they differentiate."]
             }},
             "financials": {{
-                "text": "Describe {company_name} financials and funding history including revenue, funding raised, valuation, and financial metrics. Answer in 150+ words with specific numbers.",
-                "bullets": ["List the 5 key financial metrics for {company_name} with specific numbers and funding details."]
+                "text": "Describe {company_name} financial situation including any known funding, valuation, and financial metrics. For early-stage startups, focus on funding needs and runway. Answer in 150+ words with specific details.",
+                "bullets": ["List the 5 key financial considerations for {company_name} with specific details."]
             }},
             "risks": {{
-                "text": "Describe the main risks and challenges facing {company_name} including execution, regulatory, market, and competitive risks. Answer in 150+ words with specific risk factors.",
+                "text": "Describe the main risks and challenges facing {company_name} including execution, regulatory, market, and competitive risks. For early-stage startups, focus on execution risks and market validation. Answer in 150+ words with specific risk factors.",
                 "bullets": ["List the 5 biggest risks for {company_name} with specific risk factors and challenges."]
             }},
             "timing": {{
-                "text": "Explain why now is the right time for {company_name}, what market conditions and trends make this opportunity timely. Answer in 150+ words with specific timing factors.",
+                "text": "Explain why now is the right time for {company_name}, what market conditions and trends make this opportunity timely. For early-stage startups, focus on market timing and opportunity window. Answer in 150+ words with specific timing factors.",
                 "bullets": ["List the 5 key timing factors that make {company_name} opportunity relevant now with specific market conditions."]
             }},
             "moat": {{
-                "text": "Describe {company_name} competitive moat and defensibility, how they protect their market position. Answer in 150+ words with specific defensibility factors.",
-                "bullets": ["List the 5 key defensibility factors for {company_name} with specific competitive advantages."]
+                "text": "Describe {company_name} potential competitive moat and defensibility, how they could protect their market position. For early-stage startups, focus on potential advantages and barriers to entry. Answer in 150+ words with specific defensibility factors.",
+                "bullets": ["List the 5 key potential defensibility factors for {company_name} with specific competitive advantages."]
             }}
         }}
         
-        Important guidelines:
+        Important guidelines for early-stage startups:
         - Provide actual answers to each question, not the questions themselves
         - Do NOT use generic templates or placeholder text
-        - Get actual facts, numbers, and specific details
-        - Use real company names, founder names, and specific metrics
-        - Focus on meaningful business insights with detailed analysis
-        - If information is limited, provide reasonable industry-based insights
-        - Include recent news, funding announcements, and current market positioning
+        - Get actual facts and specific details when available
+        - Use real company names, founder names, and specific details when known
+        - Focus on potential and opportunity rather than proven track record
+        - If information is limited, be honest about it and provide reasonable insights
+        - Include market context and industry trends
         - Provide detailed bullet points with substantial insights, not generic statements
-        - For recommendations: Be brutally honest about investment potential based on Speed (10x execution), Depth (domain expertise), Taste (intuition), and Influence (attention/positioning)
+        - For recommendations: Be brutally honest about investment potential for early-stage context
+        - Focus on Speed (execution capability), Depth (domain expertise), Taste (decision quality), and Influence (market positioning)
         """
         
         try:

@@ -76,7 +76,7 @@ Prepared on {{ date }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Problem description not provided in pitch deck]
+[Problem description not available - common for early-stage startups]
 {% endif %}
 
 {% if company.problem.citations %}
@@ -93,7 +93,7 @@ Prepared on {{ date }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Solution details not provided in pitch deck]
+[Solution details not available - common for early-stage startups]
 {% endif %}
 
 {% if company.solution.citations %}
@@ -110,7 +110,7 @@ Prepared on {{ date }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Product details not provided in pitch deck]
+[Product details not available - common for early-stage startups]
 {% endif %}
 
 {% if company.product.citations %}
@@ -127,7 +127,7 @@ Prepared on {{ date }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Business model details not provided in pitch deck]
+[Business model details not available - common for early-stage startups]
 {% endif %}
 
 {% if company.business_model.citations %}
@@ -144,7 +144,7 @@ Prepared on {{ date }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Market size data not provided in pitch deck]
+[Market size data not available - common for early-stage startups]
 {% endif %}
 
 {% if company.market.citations %}
@@ -161,7 +161,7 @@ Prepared on {{ date }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Traction data not provided in pitch deck]
+[Traction data not available - common for early-stage startups]
 {% endif %}
 
 {% if company.traction.citations %}
@@ -178,7 +178,7 @@ Prepared on {{ date }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Growth strategy details not provided in pitch deck]
+[Growth strategy details not available - common for early-stage startups]
 {% endif %}
 
 {% if company.growth_strategy.citations %}
@@ -195,7 +195,7 @@ Prepared on {{ date }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Team information not provided in pitch deck]
+[Team information not available - common for early-stage startups]
 {% endif %}
 
 {% if company.team.citations %}
@@ -212,7 +212,7 @@ Prepared on {{ date }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Competitive analysis not provided in pitch deck]
+[Competitive analysis not available - common for early-stage startups]
 {% endif %}
 
 {% if company.competitors.citations %}
@@ -224,12 +224,12 @@ Prepared on {{ date }}
 {{ company.financials.text }}
 
 {% if company.financials.bullets %}
-**Financial Highlights:**
+**Financial Metrics:**
 {% for bullet in company.financials.bullets %}- {{ bullet }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Financial data not provided in pitch deck]
+[Financial data not available - common for early-stage startups]
 {% endif %}
 
 {% if company.financials.citations %}
@@ -241,12 +241,12 @@ Prepared on {{ date }}
 {{ company.risks.text }}
 
 {% if company.risks.bullets %}
-**Key Risk Factors:**
+**Potential Risk Factors:**
 {% for bullet in company.risks.bullets %}- {{ bullet }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Risk assessment not provided in pitch deck]
+[Risk assessment not available - common for early-stage startups]
 {% endif %}
 
 {% if company.risks.citations %}
@@ -258,12 +258,12 @@ Prepared on {{ date }}
 {{ company.timing.text }}
 
 {% if company.timing.bullets %}
-**Timing Factors:**
+**Market Timing Considerations:**
 {% for bullet in company.timing.bullets %}- {{ bullet }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Timing analysis not provided in pitch deck]
+[Timing analysis not available - common for early-stage startups]
 {% endif %}
 
 {% if company.timing.citations %}
@@ -275,12 +275,12 @@ Prepared on {{ date }}
 {{ company.moat.text }}
 
 {% if company.moat.bullets %}
-**Competitive Advantages:**
+**Potential Defensibility Factors:**
 {% for bullet in company.moat.bullets %}- {{ bullet }}
 {% endfor %}
 {% endif %}
 {% else %}
-[Competitive moat analysis not provided in pitch deck]
+[Competitive moat analysis not available - common for early-stage startups]
 {% endif %}
 
 {% if company.moat.citations %}
