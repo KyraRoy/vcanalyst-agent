@@ -92,15 +92,19 @@ def extract_structured_data_from_sources(sources: List[Dict], company_name: str)
         prompt = f"""
         You are a professional VC analyst. Extract ONLY real, verifiable information about {company_name} from the provided sources and generate natural language summaries.
         
-        CRITICAL RULES:
+        CRITICAL ANTI-HALLUCINATION RULES:
         1. ONLY include information that is explicitly stated in the sources
         2. If information is not found, say "No public data available" or "Limited information available"
         3. NEVER make up names, numbers, or facts
-        4. Use the company's own words when describing their product/mission
-        5. If funding is mentioned, use real numbers from sources
-        6. If no specific data is found, be honest about it
-        7. Generate natural language summaries of the real information found
-        8. Be explicit about what information is limited or unavailable
+        4. NEVER use placeholder names like "Jane Doe", "John Smith", or generic names
+        5. NEVER make up funding amounts, dates, or metrics
+        6. NEVER make up company history, milestones, or achievements
+        7. Use the company's own words when describing their product/mission
+        8. If funding is mentioned, use real numbers from sources
+        9. If no specific data is found, be honest about it
+        10. Generate natural language summaries of the real information found
+        11. Be explicit about what information is limited or unavailable
+        12. If you cannot verify a fact, DO NOT include it
         
         Sources:
         {source_text}
@@ -108,36 +112,36 @@ def extract_structured_data_from_sources(sources: List[Dict], company_name: str)
         Extract and return as JSON:
         {{
             "company_description": {{
-                "official_description": "Company's own description from their website",
-                "mission_statement": "Company's mission if stated",
+                "official_description": "Company's own description from their website (if found)",
+                "mission_statement": "Company's mission if stated (if found)",
                 "website_url": "Official website URL if found"
             }},
             "team": {{
-                "founders": ["Real founder names if found"],
-                "team_members": ["Real team member names if found"],
-                "backgrounds": ["Real backgrounds if found"],
-                "linkedin_urls": ["Real LinkedIn URLs if found"]
+                "founders": ["ONLY real founder names if explicitly found"],
+                "team_members": ["ONLY real team member names if explicitly found"],
+                "backgrounds": ["ONLY real backgrounds if explicitly found"],
+                "linkedin_urls": ["ONLY real LinkedIn URLs if found"]
             }},
             "product": {{
-                "description": "What the product actually does (in company's own words)",
-                "problem_solved": "Problem they solve (in company's own words)",
-                "features": ["Real features mentioned"],
-                "target_users": "Who it's for (if mentioned)"
+                "description": "What the product actually does (in company's own words, if found)",
+                "problem_solved": "Problem they solve (in company's own words, if found)",
+                "features": ["ONLY real features explicitly mentioned"],
+                "target_users": "Who it's for (if explicitly mentioned)"
             }},
             "funding": {{
-                "total_raised": "Real funding amount if mentioned",
-                "latest_round": "Latest round details if mentioned",
-                "investors": ["Real investors if mentioned"],
+                "total_raised": "ONLY real funding amount if explicitly mentioned",
+                "latest_round": "ONLY latest round details if explicitly mentioned",
+                "investors": ["ONLY real investors if explicitly mentioned"],
                 "funding_status": "Publicly available funding info only"
             }},
             "partnerships": {{
-                "partners": ["Real partners if mentioned"],
-                "partnerships": ["Real partnerships if mentioned"]
+                "partners": ["ONLY real partners if explicitly mentioned"],
+                "partnerships": ["ONLY real partnerships if explicitly mentioned"]
             }},
             "competitors": {{
-                "mentioned_competitors": ["Competitors the company mentions"],
-                "implied_competitors": ["Competitors implied from context"],
-                "market_position": "How company positions itself (if mentioned)"
+                "mentioned_competitors": ["ONLY competitors the company explicitly mentions"],
+                "implied_competitors": ["ONLY competitors implied from context"],
+                "market_position": "How company positions itself (if explicitly mentioned)"
             }},
             "social_media": {{
                 "linkedin": "LinkedIn company page if found",
@@ -147,16 +151,19 @@ def extract_structured_data_from_sources(sources: List[Dict], company_name: str)
             "data_quality": {{
                 "verification_level": "high/medium/low based on source quality",
                 "missing_information": ["List of information that is not available"],
-                "sources_used": ["List of source types used"]
+                "sources_used": ["List of source types used"],
+                "fake_data_detected": "yes/no - whether any fake data was detected"
             }}
         }}
         
-        IMPORTANT: 
+        CRITICAL: 
         - If any field cannot be verified from the sources, use "No public data available" or empty arrays
         - Use the company's own words when describing their product and mission
         - Be explicit about what information is limited or unavailable
         - Generate natural language summaries of the real information found
         - Do not fill in gaps with assumptions or fake data
+        - If you see placeholder names like "Jane Doe" or generic information, mark it as fake data
+        - Only include information that is explicitly stated in the provided sources
         """
         
         response = client.chat.completions.create(
@@ -181,6 +188,10 @@ def extract_structured_data_from_sources(sources: List[Dict], company_name: str)
         import json
         try:
             data = json.loads(content)
+            
+            # Detect and clean fake data
+            data = detect_fake_data(data)
+            
             return data
         except json.JSONDecodeError:
             logger.error(f"Failed to parse GPT response for {company_name}")
@@ -189,6 +200,95 @@ def extract_structured_data_from_sources(sources: List[Dict], company_name: str)
     except Exception as e:
         logger.error(f"Failed to extract structured data for {company_name}: {e}")
         return {}
+
+def detect_fake_data(data: Dict) -> Dict:
+    """Detect and clean fake data from GPT response"""
+    
+    # Common fake names and patterns
+    fake_names = [
+        "jane doe", "john smith", "jane smith", "john doe", "jane johnson", "john johnson",
+        "jane williams", "john williams", "jane brown", "john brown", "jane jones", "john jones",
+        "jane garcia", "john garcia", "jane miller", "john miller", "jane davis", "john davis",
+        "jane rodriguez", "john rodriguez", "jane martinez", "john martinez", "jane hernandez",
+        "john hernandez", "jane lopez", "john lopez", "jane gonzalez", "john gonzalez",
+        "jane wilson", "john wilson", "jane anderson", "john anderson", "jane thomas",
+        "john thomas", "jane taylor", "john taylor", "jane moore", "john moore",
+        "jane jackson", "john jackson", "jane martin", "john martin", "jane lee",
+        "john lee", "jane perez", "john perez", "jane thompson", "john thompson",
+        "jane white", "john white", "jane harris", "john harris", "jane sanchez",
+        "john sanchez", "jane clark", "john clark", "jane ramirez", "john ramirez",
+        "jane lewis", "john lewis", "jane robinson", "john robinson", "jane walker",
+        "john walker", "jane young", "john young", "jane allen", "john allen",
+        "jane king", "john king", "jane wright", "john wright", "jane scott",
+        "john scott", "jane torres", "john torres", "jane nguyen", "john nguyen",
+        "jane hill", "john hill", "jane flores", "john flores", "jane green",
+        "john green", "jane adams", "john adams", "jane nelson", "john nelson",
+        "jane baker", "john baker", "jane hall", "john hall", "jane rivera",
+        "john rivera", "jane campbell", "john campbell", "jane mitchell",
+        "john mitchell", "jane carter", "john carter", "jane roberts", "john roberts"
+    ]
+    
+    # Common fake patterns
+    fake_patterns = [
+        "founded in 2018", "founded in 2019", "founded in 2020", "founded in 2021", "founded in 2022",
+        "raised $30M", "raised $50M", "raised $100M", "raised $200M", "raised $500M",
+        "series a", "series b", "series c", "seed round", "pre-seed",
+        "headquartered in san francisco", "headquartered in new york", "headquartered in silicon valley",
+        "ceo jane doe", "cto john smith", "founder jane doe", "founder john smith",
+        "phd in machine learning", "phd in computer science", "phd in artificial intelligence",
+        "previously worked at google", "previously worked at facebook", "previously worked at apple",
+        "previously worked at microsoft", "previously worked at amazon", "previously worked at tesla"
+    ]
+    
+    cleaned_data = data.copy()
+    fake_detected = False
+    
+    # Check team names
+    if 'team' in cleaned_data:
+        if 'founders' in cleaned_data['team']:
+            founders = cleaned_data['team']['founders']
+            if isinstance(founders, list):
+                for founder in founders:
+                    if isinstance(founder, str) and founder.lower() in fake_names:
+                        fake_detected = True
+                        cleaned_data['team']['founders'] = []
+                        break
+        
+        if 'team_members' in cleaned_data['team']:
+            team_members = cleaned_data['team']['team_members']
+            if isinstance(team_members, list):
+                for member in team_members:
+                    if isinstance(member, str) and member.lower() in fake_names:
+                        fake_detected = True
+                        cleaned_data['team']['team_members'] = []
+                        break
+    
+    # Check funding amounts
+    if 'funding' in cleaned_data:
+        if 'total_raised' in cleaned_data['funding']:
+            total_raised = cleaned_data['funding']['total_raised']
+            if isinstance(total_raised, str):
+                # Check for common fake funding patterns
+                if any(pattern in total_raised.lower() for pattern in ["$30m", "$50m", "$100m", "$200m", "$500m"]):
+                    fake_detected = True
+                    cleaned_data['funding']['total_raised'] = "No public data available"
+    
+    # Check company description for fake patterns
+    if 'company_description' in cleaned_data:
+        if 'official_description' in cleaned_data['company_description']:
+            desc = cleaned_data['company_description']['official_description']
+            if isinstance(desc, str):
+                if any(pattern in desc.lower() for pattern in fake_patterns):
+                    fake_detected = True
+                    cleaned_data['company_description']['official_description'] = "Limited public data available"
+    
+    # Update data quality
+    if 'data_quality' in cleaned_data:
+        cleaned_data['data_quality']['fake_data_detected'] = "yes" if fake_detected else "no"
+        if fake_detected:
+            cleaned_data['data_quality']['verification_level'] = "low"
+    
+    return cleaned_data
 
 class CompanyResearcher:
     def __init__(self):
@@ -410,16 +510,19 @@ class CompanyResearcher:
         if summary_parts:
             summary_text = f"{company_doc.name} is a company that {' '.join(summary_parts)}."
         else:
-            summary_text = f"{company_doc.name} has limited public information available."
+            summary_text = f"{company_doc.name} has limited public information available. No verifiable details could be found from reliable sources."
         
         # Add data quality context
         data_quality = data.get('data_quality', {})
         verification_level = data_quality.get('verification_level', 'unknown')
         missing_info = data_quality.get('missing_information', [])
+        fake_detected = data_quality.get('fake_data_detected', 'no')
         
         quality_bullets = [f"Data quality: {verification_level}"]
         if missing_info:
             quality_bullets.append(f"Missing information: {', '.join(missing_info)}")
+        if fake_detected == 'yes':
+            quality_bullets.append("⚠️ Fake data detected and removed")
         
         company_doc.intro = Section(
             text=summary_text,
@@ -428,7 +531,9 @@ class CompanyResearcher:
         )
         
         # Create recommendations based on data quality
-        if verification_level == 'high':
+        if fake_detected == 'yes':
+            rec_text = f"⚠️ Fake data was detected in the analysis of {company_doc.name}. Recommend conducting primary research to verify all information."
+        elif verification_level == 'high':
             rec_text = f"Based on high-quality sources, {company_doc.name} shows potential for investment consideration."
         elif verification_level == 'medium':
             rec_text = f"Based on available sources, {company_doc.name} shows some potential but more research is recommended."
