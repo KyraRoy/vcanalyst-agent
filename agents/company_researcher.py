@@ -90,68 +90,73 @@ def extract_structured_data_from_sources(sources: List[Dict], company_name: str)
             source_text += f"Content: {source.get('text', '')[:1000]}...\n\n"
         
         prompt = f"""
-        You are a professional VC analyst. Extract ONLY real, verifiable information about {company_name} from the provided sources.
+        You are a professional VC analyst. Extract ONLY real, verifiable information about {company_name} from the provided sources and generate natural language summaries.
         
         CRITICAL RULES:
         1. ONLY include information that is explicitly stated in the sources
-        2. If information is not found, say "No public data available"
+        2. If information is not found, say "No public data available" or "Limited information available"
         3. NEVER make up names, numbers, or facts
-        4. If founders are mentioned, use their real names
+        4. Use the company's own words when describing their product/mission
         5. If funding is mentioned, use real numbers from sources
         6. If no specific data is found, be honest about it
-        7. For early-stage startups, accept information from founder blogs, social media, and community platforms
-        8. Be flexible with source quality for startups that may not have major news coverage
+        7. Generate natural language summaries of the real information found
+        8. Be explicit about what information is limited or unavailable
         
         Sources:
         {source_text}
         
         Extract and return as JSON:
         {{
-            "founders": {{
-                "names": ["List real founder names if found"],
-                "backgrounds": ["List real backgrounds if found"],
-                "linkedin_urls": ["List real LinkedIn URLs if found"]
+            "company_description": {{
+                "official_description": "Company's own description from their website",
+                "mission_statement": "Company's mission if stated",
+                "website_url": "Official website URL if found"
+            }},
+            "team": {{
+                "founders": ["Real founder names if found"],
+                "team_members": ["Real team member names if found"],
+                "backgrounds": ["Real backgrounds if found"],
+                "linkedin_urls": ["Real LinkedIn URLs if found"]
             }},
             "product": {{
-                "description": "What the product actually does (from sources)",
-                "target_users": "Who it's for (from sources)",
-                "features": ["List real features mentioned"],
-                "stage": "MVP/Beta/Alpha/Launched if mentioned"
-            }},
-            "market": {{
-                "size": "Market size if mentioned with real numbers",
-                "competitors": ["List real competitors mentioned"],
-                "industry": "Industry if mentioned",
-                "problem": "Problem they're solving if mentioned"
+                "description": "What the product actually does (in company's own words)",
+                "problem_solved": "Problem they solve (in company's own words)",
+                "features": ["Real features mentioned"],
+                "target_users": "Who it's for (if mentioned)"
             }},
             "funding": {{
                 "total_raised": "Real funding amount if mentioned",
                 "latest_round": "Latest round details if mentioned",
-                "investors": ["List real investors if mentioned"],
-                "stage": "Pre-seed/Seed/Series A/etc if mentioned"
+                "investors": ["Real investors if mentioned"],
+                "funding_status": "Publicly available funding info only"
             }},
-            "traction": {{
-                "users": "User numbers if mentioned",
-                "revenue": "Revenue if mentioned",
-                "growth": "Growth metrics if mentioned",
-                "customers": "Customer count if mentioned",
-                "downloads": "Download numbers if mentioned"
+            "partnerships": {{
+                "partners": ["Real partners if mentioned"],
+                "partnerships": ["Real partnerships if mentioned"]
             }},
-            "website": "Company website URL if found",
+            "competitors": {{
+                "mentioned_competitors": ["Competitors the company mentions"],
+                "implied_competitors": ["Competitors implied from context"],
+                "market_position": "How company positions itself (if mentioned)"
+            }},
             "social_media": {{
-                "twitter": "Twitter/X handle if found",
                 "linkedin": "LinkedIn company page if found",
-                "github": "GitHub repo if found",
-                "producthunt": "Product Hunt page if found"
+                "twitter": "Twitter/X handle if found",
+                "website": "Official website if found"
             }},
-            "verification_level": "high/medium/low based on source quality",
-            "startup_stage": "early-stage/established based on available data"
+            "data_quality": {{
+                "verification_level": "high/medium/low based on source quality",
+                "missing_information": ["List of information that is not available"],
+                "sources_used": ["List of source types used"]
+            }}
         }}
         
         IMPORTANT: 
         - If any field cannot be verified from the sources, use "No public data available" or empty arrays
-        - For early-stage startups, accept information from founder posts, social media, and community platforms
-        - Be honest about data quality and source reliability
+        - Use the company's own words when describing their product and mission
+        - Be explicit about what information is limited or unavailable
+        - Generate natural language summaries of the real information found
+        - Do not fill in gaps with assumptions or fake data
         """
         
         response = client.chat.completions.create(
@@ -196,83 +201,55 @@ class CompanyResearcher:
         """
         logger.info(f"Searching verifiable sources for {company_name}")
         
-        # Comprehensive search queries for both established and early-stage companies
+        # Focused search queries for real company information
         search_queries = [
-            # Official sources
+            # Official company sources
             f'"{company_name}" official website',
             f'"{company_name}" company',
-            f'"{company_name}" startup',
+            f'"{company_name}" about us',
+            f'"{company_name}" mission',
             
-            # Founder and team
-            f'"{company_name}" founder',
-            f'"{company_name}" CEO',
-            f'"{company_name}" team',
-            f'"{company_name}" founder Crunchbase',
-            f'"{company_name}" founder LinkedIn',
-            
-            # Platform-specific searches
+            # Social media and professional networks
             f'site:linkedin.com "{company_name}"',
-            f'site:crunchbase.com "{company_name}"',
+            f'site:twitter.com "{company_name}"',
+            f'site:x.com "{company_name}"',
+            f'"{company_name}" LinkedIn',
+            f'"{company_name}" Twitter',
+            
+            # Tech and startup news
+            f'site:techcrunch.com "{company_name}"',
+            f'site:venturebeat.com "{company_name}"',
             f'site:producthunt.com "{company_name}"',
             f'site:angel.co "{company_name}"',
             f'site:angellist.com "{company_name}"',
             f'site:ycombinator.com "{company_name}"',
             f'site:techstars.com "{company_name}"',
-            f'site:medium.com "{company_name}"',
-            f'site:substack.com "{company_name}"',
-            f'site:github.com "{company_name}"',
-            f'site:twitter.com "{company_name}"',
-            f'site:x.com "{company_name}"',
-            f'site:reddit.com "{company_name}"',
-            f'site:hackernews.com "{company_name}"',
             
-            # News and media
-            f'site:techcrunch.com "{company_name}"',
-            f'site:forbes.com "{company_name}"',
-            f'site:bloomberg.com "{company_name}"',
-            f'site:venturebeat.com "{company_name}"',
-            f'site:wsj.com "{company_name}"',
-            f'site:reuters.com "{company_name}"',
-            f'site:cnbc.com "{company_name}"',
-            
-            # Product and business
+            # Product and business information
             f'"{company_name}" product',
-            f'"{company_name}" launch',
-            f'"{company_name}" demo',
-            f'"{company_name}" beta',
-            f'"{company_name}" alpha',
-            f'"{company_name}" MVP',
-            f'"{company_name}" minimum viable product',
+            f'"{company_name}" what we do',
+            f'"{company_name}" problem we solve',
+            f'"{company_name}" features',
+            f'"{company_name}" how it works',
             
-            # Funding and investment
+            # Team and founders
+            f'"{company_name}" team',
+            f'"{company_name}" founders',
+            f'"{company_name}" CEO',
+            f'"{company_name}" about team',
+            
+            # Funding and partnerships (only if publicly available)
             f'"{company_name}" funding',
             f'"{company_name}" investment',
-            f'"{company_name}" seed',
-            f'"{company_name}" series A',
-            f'"{company_name}" angel',
-            f'"{company_name}" pre-seed',
-            f'"{company_name}" round',
+            f'"{company_name}" partners',
+            f'"{company_name}" partnerships',
+            f'site:crunchbase.com "{company_name}"',
             
-            # Traction and metrics
-            f'"{company_name}" users',
-            f'"{company_name}" customers',
-            f'"{company_name}" revenue',
-            f'"{company_name}" growth',
-            f'"{company_name}" traction',
-            f'"{company_name}" metrics',
-            
-            # Industry and market
-            f'"{company_name}" market',
-            f'"{company_name}" industry',
+            # Competitors and market
             f'"{company_name}" competitors',
-            f'"{company_name}" competition',
-            
-            # Social and community
-            f'"{company_name}" community',
-            f'"{company_name}" users',
-            f'"{company_name}" feedback',
-            f'"{company_name}" reviews',
-            f'"{company_name}" testimonials'
+            f'"{company_name}" vs',
+            f'"{company_name}" alternative',
+            f'"{company_name}" market'
         ]
         
         all_sources = []
@@ -376,7 +353,7 @@ class CompanyResearcher:
         return company_doc
     
     def _map_data_to_sections(self, company_doc: StructuredCompanyDoc, data: Dict, sources: List[Dict]):
-        """Map extracted data to memo sections with proper citations"""
+        """Map extracted data to memo sections with proper citations and natural language summaries"""
         
         # Create citations from sources
         citations = []
@@ -389,18 +366,97 @@ class CompanyResearcher:
             )
             citations.append(citation)
         
-        # Map founders data
-        if data.get('founders'):
-            founders_text = ""
-            if data['founders'].get('names'):
-                founders_text += f"Founders: {', '.join(data['founders']['names'])}. "
-            if data['founders'].get('backgrounds'):
-                founders_text += f"Backgrounds: {'; '.join(data['founders']['backgrounds'])}"
+        # Create natural language summary based on real information
+        summary_parts = []
+        
+        # Company description
+        if data.get('company_description'):
+            if data['company_description'].get('official_description'):
+                summary_parts.append(f"{data['company_description']['official_description']}")
+            if data['company_description'].get('mission_statement'):
+                summary_parts.append(f"Their mission is: {data['company_description']['mission_statement']}")
+        
+        # Team information
+        if data.get('team'):
+            team_info = []
+            if data['team'].get('founders'):
+                team_info.append(f"Founded by {', '.join(data['team']['founders'])}")
+            if data['team'].get('team_members'):
+                team_info.append(f"Team includes {', '.join(data['team']['team_members'])}")
+            if team_info:
+                summary_parts.append(' '.join(team_info))
+        
+        # Product information
+        if data.get('product'):
+            product_info = []
+            if data['product'].get('description'):
+                product_info.append(f"They build {data['product']['description']}")
+            if data['product'].get('problem_solved'):
+                product_info.append(f"to solve {data['product']['problem_solved']}")
+            if product_info:
+                summary_parts.append(' '.join(product_info))
+        
+        # Funding information (only if publicly available)
+        if data.get('funding'):
+            funding_info = []
+            if data['funding'].get('total_raised'):
+                funding_info.append(f"They have raised {data['funding']['total_raised']}")
+            if data['funding'].get('latest_round'):
+                funding_info.append(f"with their latest round being {data['funding']['latest_round']}")
+            if funding_info:
+                summary_parts.append(' '.join(funding_info))
+        
+        # Create executive summary
+        if summary_parts:
+            summary_text = f"{company_doc.name} is a company that {' '.join(summary_parts)}."
+        else:
+            summary_text = f"{company_doc.name} has limited public information available."
+        
+        # Add data quality context
+        data_quality = data.get('data_quality', {})
+        verification_level = data_quality.get('verification_level', 'unknown')
+        missing_info = data_quality.get('missing_information', [])
+        
+        quality_bullets = [f"Data quality: {verification_level}"]
+        if missing_info:
+            quality_bullets.append(f"Missing information: {', '.join(missing_info)}")
+        
+        company_doc.intro = Section(
+            text=summary_text,
+            bullets=quality_bullets,
+            citations=citations
+        )
+        
+        # Create recommendations based on data quality
+        if verification_level == 'high':
+            rec_text = f"Based on high-quality sources, {company_doc.name} shows potential for investment consideration."
+        elif verification_level == 'medium':
+            rec_text = f"Based on available sources, {company_doc.name} shows some potential but more research is recommended."
+        else:
+            rec_text = f"Limited data available for {company_doc.name}. Recommend conducting primary research before making investment decisions."
+        
+        company_doc.recommendations = Section(
+            text=rec_text,
+            bullets=[
+                f"Data quality: {verification_level}",
+                "Recommend conducting additional research",
+                "Consider reaching out to company directly"
+            ],
+            citations=citations
+        )
+        
+        # Map team data
+        if data.get('team'):
+            team_text = ""
+            if data['team'].get('founders'):
+                team_text += f"Founders: {', '.join(data['team']['founders'])}. "
+            if data['team'].get('team_members'):
+                team_text += f"Team members: {', '.join(data['team']['team_members'])}"
             
-            if founders_text:
+            if team_text:
                 company_doc.team = Section(
-                    text=founders_text,
-                    bullets=data['founders'].get('names', []),
+                    text=team_text,
+                    bullets=data['team'].get('founders', []),
                     citations=citations
                 )
         
@@ -409,8 +465,8 @@ class CompanyResearcher:
             product_text = ""
             if data['product'].get('description'):
                 product_text += f"{data['product']['description']}. "
-            if data['product'].get('target_users'):
-                product_text += f"Target users: {data['product']['target_users']}"
+            if data['product'].get('problem_solved'):
+                product_text += f"Problem solved: {data['product']['problem_solved']}"
             
             if product_text:
                 company_doc.product = Section(
@@ -419,18 +475,16 @@ class CompanyResearcher:
                     citations=citations
                 )
         
-        # Map market data
-        if data.get('market'):
-            market_text = ""
-            if data['market'].get('size'):
-                market_text += f"Market size: {data['market']['size']}. "
-            if data['market'].get('industry'):
-                market_text += f"Industry: {data['market']['industry']}"
+        # Map competitors data
+        if data.get('competitors'):
+            competitors_text = ""
+            if data['competitors'].get('market_position'):
+                competitors_text += f"Market position: {data['competitors']['market_position']}. "
             
-            if market_text:
-                company_doc.market = Section(
-                    text=market_text,
-                    bullets=data['market'].get('competitors', []),
+            if competitors_text:
+                company_doc.competitors = Section(
+                    text=competitors_text,
+                    bullets=data['competitors'].get('mentioned_competitors', []),
                     citations=citations
                 )
         
@@ -448,68 +502,6 @@ class CompanyResearcher:
                     bullets=data['funding'].get('investors', []),
                     citations=citations
                 )
-        
-        # Map traction data
-        if data.get('traction'):
-            traction_text = ""
-            if data['traction'].get('users'):
-                traction_text += f"Users: {data['traction']['users']}. "
-            if data['traction'].get('revenue'):
-                traction_text += f"Revenue: {data['traction']['revenue']}"
-            
-            if traction_text:
-                company_doc.traction = Section(
-                    text=traction_text,
-                    bullets=[f"Growth: {data['traction'].get('growth', 'N/A')}"],
-                    citations=citations
-                )
-        
-        # Create executive summary
-        summary_text = f"{company_name} "
-        
-        # Determine if it's an early-stage startup
-        startup_stage = data.get('startup_stage', 'unknown')
-        verification_level = data.get('verification_level', 'unknown')
-        
-        if startup_stage == 'early-stage':
-            summary_text += "appears to be an early-stage startup. "
-        elif startup_stage == 'established':
-            summary_text += "appears to be an established company. "
-        else:
-            summary_text += "is a company with limited public information available. "
-        
-        if data.get('product', {}).get('description'):
-            summary_text += data['product']['description']
-        
-        # Add verification context
-        verification_bullets = [f"Verification level: {verification_level}"]
-        if startup_stage != 'unknown':
-            verification_bullets.append(f"Startup stage: {startup_stage}")
-        
-        company_doc.intro = Section(
-            text=summary_text,
-            bullets=verification_bullets,
-            citations=citations
-        )
-        
-        # Create recommendations based on data quality
-        if verification_level == 'high':
-            rec_text = f"Based on high-quality sources, {company_name} shows potential for investment consideration."
-        elif verification_level == 'medium':
-            rec_text = f"Based on available sources, {company_name} shows some potential but more research is recommended."
-        else:
-            rec_text = f"Limited data available for {company_name}. Recommend conducting primary research before making investment decisions."
-        
-        company_doc.recommendations = Section(
-            text=rec_text,
-            bullets=[
-                f"Data quality: {verification_level}",
-                f"Startup stage: {startup_stage}",
-                "Recommend conducting additional research",
-                "Consider reaching out to company directly"
-            ],
-            citations=citations
-        )
     
     def _determine_source_type(self, url: str) -> str:
         """Determine the source type based on URL"""
