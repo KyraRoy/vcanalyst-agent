@@ -36,7 +36,42 @@ def is_high_quality_source(url: str, title: str = "") -> bool:
         if not any(generic in url_lower for generic in ['template', 'example', 'sample']):
             return True
     
+    # Early-stage startup sources
+    startup_sources = [
+        'producthunt.com', 'hackernews.com', 'reddit.com', 'twitter.com', 'x.com',
+        'medium.com', 'substack.com', 'github.com', 'angel.co', 'angellist.com',
+        'ycombinator.com', 'demo-day', 'startup-school', 'indiehackers.com',
+        'makers.com', 'nomadlist.com', 'remoteok.com', 'wework.com', 'techstars.com'
+    ]
+    
+    for source in startup_sources:
+        if source in url_lower:
+            return True
+    
     return False
+
+def is_acceptable_source(url: str, title: str = "", company_name: str = "") -> bool:
+    """Return True if the source is acceptable for early-stage startups"""
+    url_lower = url.lower()
+    title_lower = title.lower()
+    company_lower = company_name.lower()
+    
+    # Must mention the company name
+    if company_name and company_lower not in url_lower and company_lower not in title_lower:
+        return False
+    
+    # Reject obvious spam or irrelevant sites
+    spam_domains = [
+        'spam.com', 'clickbait.com', 'fake-news.com', 'template.com',
+        'example.com', 'sample.com', 'test.com', 'placeholder.com'
+    ]
+    
+    for spam in spam_domains:
+        if spam in url_lower:
+            return False
+    
+    # Accept most domains that mention the company
+    return True
 
 def extract_structured_data_from_sources(sources: List[Dict], company_name: str) -> Dict[str, Any]:
     """
@@ -62,8 +97,10 @@ def extract_structured_data_from_sources(sources: List[Dict], company_name: str)
         2. If information is not found, say "No public data available"
         3. NEVER make up names, numbers, or facts
         4. If founders are mentioned, use their real names
-        5. If funding is mentioned, use real numbers from Crunchbase/news
+        5. If funding is mentioned, use real numbers from sources
         6. If no specific data is found, be honest about it
+        7. For early-stage startups, accept information from founder blogs, social media, and community platforms
+        8. Be flexible with source quality for startups that may not have major news coverage
         
         Sources:
         {source_text}
@@ -78,32 +115,43 @@ def extract_structured_data_from_sources(sources: List[Dict], company_name: str)
             "product": {{
                 "description": "What the product actually does (from sources)",
                 "target_users": "Who it's for (from sources)",
-                "features": ["List real features mentioned"]
+                "features": ["List real features mentioned"],
+                "stage": "MVP/Beta/Alpha/Launched if mentioned"
             }},
             "market": {{
                 "size": "Market size if mentioned with real numbers",
                 "competitors": ["List real competitors mentioned"],
-                "industry": "Industry if mentioned"
+                "industry": "Industry if mentioned",
+                "problem": "Problem they're solving if mentioned"
             }},
             "funding": {{
                 "total_raised": "Real funding amount if mentioned",
                 "latest_round": "Latest round details if mentioned",
-                "investors": ["List real investors if mentioned"]
+                "investors": ["List real investors if mentioned"],
+                "stage": "Pre-seed/Seed/Series A/etc if mentioned"
             }},
             "traction": {{
                 "users": "User numbers if mentioned",
                 "revenue": "Revenue if mentioned",
-                "growth": "Growth metrics if mentioned"
+                "growth": "Growth metrics if mentioned",
+                "customers": "Customer count if mentioned",
+                "downloads": "Download numbers if mentioned"
             }},
             "website": "Company website URL if found",
             "social_media": {{
                 "twitter": "Twitter/X handle if found",
-                "linkedin": "LinkedIn company page if found"
+                "linkedin": "LinkedIn company page if found",
+                "github": "GitHub repo if found",
+                "producthunt": "Product Hunt page if found"
             }},
-            "verification_level": "high/medium/low based on source quality"
+            "verification_level": "high/medium/low based on source quality",
+            "startup_stage": "early-stage/established based on available data"
         }}
         
-        IMPORTANT: If any field cannot be verified from the sources, use "No public data available" or empty arrays.
+        IMPORTANT: 
+        - If any field cannot be verified from the sources, use "No public data available" or empty arrays
+        - For early-stage startups, accept information from founder posts, social media, and community platforms
+        - Be honest about data quality and source reliability
         """
         
         response = client.chat.completions.create(
@@ -148,25 +196,87 @@ class CompanyResearcher:
         """
         logger.info(f"Searching verifiable sources for {company_name}")
         
-        # Specific search queries for real data
+        # Comprehensive search queries for both established and early-stage companies
         search_queries = [
+            # Official sources
             f'"{company_name}" official website',
-            f'"{company_name}" AI startup',
+            f'"{company_name}" company',
+            f'"{company_name}" startup',
+            
+            # Founder and team
+            f'"{company_name}" founder',
+            f'"{company_name}" CEO',
+            f'"{company_name}" team',
             f'"{company_name}" founder Crunchbase',
+            f'"{company_name}" founder LinkedIn',
+            
+            # Platform-specific searches
             f'site:linkedin.com "{company_name}"',
             f'site:crunchbase.com "{company_name}"',
+            f'site:producthunt.com "{company_name}"',
+            f'site:angel.co "{company_name}"',
+            f'site:angellist.com "{company_name}"',
+            f'site:ycombinator.com "{company_name}"',
+            f'site:techstars.com "{company_name}"',
+            f'site:medium.com "{company_name}"',
+            f'site:substack.com "{company_name}"',
+            f'site:github.com "{company_name}"',
+            f'site:twitter.com "{company_name}"',
+            f'site:x.com "{company_name}"',
+            f'site:reddit.com "{company_name}"',
+            f'site:hackernews.com "{company_name}"',
+            
+            # News and media
             f'site:techcrunch.com "{company_name}"',
             f'site:forbes.com "{company_name}"',
             f'site:bloomberg.com "{company_name}"',
-            f'"{company_name}" funding round',
-            f'"{company_name}" series A B C',
-            f'"{company_name}" CEO founder',
-            f'"{company_name}" product launch',
-            f'"{company_name}" users customers',
-            f'"{company_name}" revenue growth'
+            f'site:venturebeat.com "{company_name}"',
+            f'site:wsj.com "{company_name}"',
+            f'site:reuters.com "{company_name}"',
+            f'site:cnbc.com "{company_name}"',
+            
+            # Product and business
+            f'"{company_name}" product',
+            f'"{company_name}" launch',
+            f'"{company_name}" demo',
+            f'"{company_name}" beta',
+            f'"{company_name}" alpha',
+            f'"{company_name}" MVP',
+            f'"{company_name}" minimum viable product',
+            
+            # Funding and investment
+            f'"{company_name}" funding',
+            f'"{company_name}" investment',
+            f'"{company_name}" seed',
+            f'"{company_name}" series A',
+            f'"{company_name}" angel',
+            f'"{company_name}" pre-seed',
+            f'"{company_name}" round',
+            
+            # Traction and metrics
+            f'"{company_name}" users',
+            f'"{company_name}" customers',
+            f'"{company_name}" revenue',
+            f'"{company_name}" growth',
+            f'"{company_name}" traction',
+            f'"{company_name}" metrics',
+            
+            # Industry and market
+            f'"{company_name}" market',
+            f'"{company_name}" industry',
+            f'"{company_name}" competitors',
+            f'"{company_name}" competition',
+            
+            # Social and community
+            f'"{company_name}" community',
+            f'"{company_name}" users',
+            f'"{company_name}" feedback',
+            f'"{company_name}" reviews',
+            f'"{company_name}" testimonials'
         ]
         
         all_sources = []
+        high_quality_sources = []
         
         try:
             # Perform searches
@@ -174,14 +284,14 @@ class CompanyResearcher:
                 try:
                     results = search_google(company_name, [query])
                     if results:
-                        # Filter for high-quality sources
-                        filtered_results = []
+                        # Separate high-quality and acceptable sources
                         for result in results:
                             if is_high_quality_source(result.get('url', ''), result.get('title', '')):
-                                filtered_results.append(result)
+                                high_quality_sources.append(result)
+                            elif is_acceptable_source(result.get('url', ''), result.get('title', ''), company_name):
+                                all_sources.append(result)
                         
-                        all_sources.extend(filtered_results)
-                        logger.info(f"Found {len(filtered_results)} high-quality results for query: {query}")
+                        logger.info(f"Found {len(results)} results for query: {query}")
                         
                 except Exception as e:
                     logger.warning(f"Search failed for query '{query}': {e}")
@@ -190,8 +300,20 @@ class CompanyResearcher:
         except Exception as e:
             logger.error(f"Search failed for {company_name}: {e}")
         
-        logger.info(f"Total high-quality sources found for {company_name}: {len(all_sources)}")
-        return all_sources
+        # Prioritize high-quality sources but include acceptable ones
+        final_sources = high_quality_sources + all_sources
+        
+        # Remove duplicates based on URL
+        seen_urls = set()
+        unique_sources = []
+        for source in final_sources:
+            url = source.get('url', '')
+            if url and url not in seen_urls:
+                seen_urls.add(url)
+                unique_sources.append(source)
+        
+        logger.info(f"Total sources found for {company_name}: {len(unique_sources)} (High quality: {len(high_quality_sources)})")
+        return unique_sources
     
     def create_verifiable_memo(self, company_name: str) -> StructuredCompanyDoc:
         """
@@ -227,20 +349,26 @@ class CompanyResearcher:
         company_doc = StructuredCompanyDoc(name=company_name)
         
         # Create sections indicating insufficient data
-        insufficient_text = f"Insufficient public data available for {company_name}. No verifiable information could be found from reliable sources."
+        insufficient_text = f"Insufficient public data available for {company_name}. This could be an early-stage startup with limited online presence, or the company may be using a different name."
         
         company_doc.intro = Section(
             text=insufficient_text,
-            bullets=["No public company information available"],
+            bullets=[
+                "No public company information available",
+                "May be an early-stage startup",
+                "Consider reaching out to company directly"
+            ],
             citations=[]
         )
         
         company_doc.recommendations = Section(
-            text=f"Cannot provide investment recommendations for {company_name} due to insufficient public data.",
+            text=f"Cannot provide investment recommendations for {company_name} due to insufficient public data. This is common for early-stage startups that haven't yet established significant online presence.",
             bullets=[
                 "Insufficient public data for analysis",
+                "Common for early-stage startups",
                 "Recommend conducting primary research",
-                "Consider reaching out to company directly"
+                "Consider reaching out to company directly",
+                "Check if company uses different name"
             ],
             citations=[]
         )
@@ -337,13 +465,49 @@ class CompanyResearcher:
                 )
         
         # Create executive summary
-        summary_text = f"{company_name} is a company with limited public information available. "
+        summary_text = f"{company_name} "
+        
+        # Determine if it's an early-stage startup
+        startup_stage = data.get('startup_stage', 'unknown')
+        verification_level = data.get('verification_level', 'unknown')
+        
+        if startup_stage == 'early-stage':
+            summary_text += "appears to be an early-stage startup. "
+        elif startup_stage == 'established':
+            summary_text += "appears to be an established company. "
+        else:
+            summary_text += "is a company with limited public information available. "
+        
         if data.get('product', {}).get('description'):
             summary_text += data['product']['description']
         
+        # Add verification context
+        verification_bullets = [f"Verification level: {verification_level}"]
+        if startup_stage != 'unknown':
+            verification_bullets.append(f"Startup stage: {startup_stage}")
+        
         company_doc.intro = Section(
             text=summary_text,
-            bullets=[f"Verification level: {data.get('verification_level', 'unknown')}"],
+            bullets=verification_bullets,
+            citations=citations
+        )
+        
+        # Create recommendations based on data quality
+        if verification_level == 'high':
+            rec_text = f"Based on high-quality sources, {company_name} shows potential for investment consideration."
+        elif verification_level == 'medium':
+            rec_text = f"Based on available sources, {company_name} shows some potential but more research is recommended."
+        else:
+            rec_text = f"Limited data available for {company_name}. Recommend conducting primary research before making investment decisions."
+        
+        company_doc.recommendations = Section(
+            text=rec_text,
+            bullets=[
+                f"Data quality: {verification_level}",
+                f"Startup stage: {startup_stage}",
+                "Recommend conducting additional research",
+                "Consider reaching out to company directly"
+            ],
             citations=citations
         )
     
