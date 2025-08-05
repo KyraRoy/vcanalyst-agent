@@ -380,52 +380,26 @@ class EnhancedAnalyzer:
         logger.info(f"Starting web research memo generation for {company_name}")
         
         try:
-            # Add timeout wrapper to prevent infinite hanging
-            import signal
+            # Perform comprehensive web research
+            research_data = self._comprehensive_web_research(company_name, industry)
             
-            def timeout_handler(signum, frame):
-                raise TimeoutError(f"Analysis timed out for {company_name}")
-            
-            # Set 3-minute timeout
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(180)  # 3 minutes
-            
-            try:
-                # Perform comprehensive web research
-                research_data = self._comprehensive_web_research(company_name, industry)
-                
-                if not research_data:
-                    logger.warning(f"No web research data found for {company_name}, falling back to GPT knowledge")
-                    # Fallback to GPT knowledge
-                    memo_sections = self._generate_memo_from_gpt_knowledge(company_name, industry)
-                else:
-                    # Synthesize research into memo sections
-                    memo_sections = self._synthesize_research_to_memo(research_data, company_name)
-                
-                # Create comprehensive memo
-                memo = self._create_comprehensive_memo_from_research(memo_sections, company_name)
-                
-                signal.alarm(0)  # Cancel timeout
-                logger.info(f"Successfully generated memo for {company_name}")
-                return memo
-                
-            except TimeoutError as e:
-                logger.error(f"Analysis timed out for {company_name}: {e}")
+            if not research_data:
+                logger.warning(f"No web research data found for {company_name}, falling back to GPT knowledge")
                 # Fallback to GPT knowledge
                 memo_sections = self._generate_memo_from_gpt_knowledge(company_name, industry)
-                memo = self._create_comprehensive_memo_from_research(memo_sections, company_name)
-                return memo
-                
-            except Exception as e:
-                logger.error(f"Web research failed for {company_name}: {e}")
-                # Fallback to GPT knowledge
-                memo_sections = self._generate_memo_from_gpt_knowledge(company_name, industry)
-                memo = self._create_comprehensive_memo_from_research(memo_sections, company_name)
-                return memo
-                
+            else:
+                # Synthesize research into memo sections
+                memo_sections = self._synthesize_research_to_memo(research_data, company_name)
+            
+            # Create comprehensive memo
+            memo = self._create_comprehensive_memo_from_research(memo_sections, company_name)
+            
+            logger.info(f"Successfully generated memo for {company_name}")
+            return memo
+            
         except Exception as e:
-            logger.error(f"Unexpected error in memo generation for {company_name}: {e}")
-            # Final fallback
+            logger.error(f"Web research failed for {company_name}: {e}")
+            # Fallback to GPT knowledge
             memo_sections = self._generate_memo_from_gpt_knowledge(company_name, industry)
             memo = self._create_comprehensive_memo_from_research(memo_sections, company_name)
             return memo
@@ -441,70 +415,76 @@ class EnhancedAnalyzer:
         Returns:
             Dictionary of research data
         """
-        logger.info(f"Starting web research for {company_name}")
+        logger.info(f"Performing comprehensive web research for {company_name}")
         
-        # Define comprehensive search queries (LIMITED to prevent hanging)
+        # Define comprehensive search queries
         search_queries = [
-            # Company overview (most important)
+            # Company overview
             f"{company_name} company overview",
             f"{company_name} about us",
+            f"{company_name} mission vision",
             
             # Problem and solution
             f"{company_name} problem solution",
             f"{company_name} what problem does it solve",
+            f"{company_name} value proposition",
+            
+            # Product and features
+            f"{company_name} product features",
+            f"{company_name} platform technology",
+            f"{company_name} how it works",
             
             # Business model
             f"{company_name} business model",
             f"{company_name} revenue model",
+            f"{company_name} pricing",
             
             # Market and opportunity
             f"{company_name} market size",
+            f"{company_name} TAM SAM SOM",
             f"{industry} market size 2024" if industry else f"{company_name} industry market size",
             
             # Traction and metrics
             f"{company_name} revenue growth",
+            f"{company_name} user metrics",
             f"{company_name} funding raised",
             
             # Team and founders
             f"{company_name} founders team",
             f"{company_name} CEO CTO",
+            f"{company_name} leadership",
             
             # Competition
             f"{company_name} competitors",
             f"{company_name} competitive landscape",
+            f"{company_name} vs competitors",
             
             # Financials
             f"{company_name} financials",
             f"{company_name} funding rounds",
+            f"{company_name} valuation",
             
             # Growth strategy
             f"{company_name} growth strategy",
             f"{company_name} expansion plans",
+            f"{company_name} go-to-market",
             
             # Industry insights
             f"{industry} trends 2024" if industry else f"{company_name} industry trends",
+            f"{industry} growth rate" if industry else f"{company_name} market growth",
             f"McKinsey {industry} report" if industry else f"McKinsey {company_name} industry report"
         ]
         
-        # LIMIT to 10 queries to prevent hanging
-        limited_queries = search_queries[:10]
-        logger.info(f"Processing {len(limited_queries)} search queries for {company_name}")
-        
-        # Perform web searches with timeout
+        # Perform web searches
         research_data = {}
-        for i, query in enumerate(limited_queries):
+        for query in search_queries:
             try:
-                logger.info(f"Searching query {i+1}/{len(limited_queries)}: {query}")
                 results = search_google(company_name, [query])
                 if results:
                     research_data[query] = results
-                    logger.info(f"Found {len(results)} results for query: {query}")
-                else:
-                    logger.warning(f"No results found for query: {query}")
             except Exception as e:
                 logger.warning(f"Web search failed for query '{query}': {e}")
         
-        logger.info(f"Completed web research for {company_name}: {len(research_data)} successful queries")
         return research_data
     
     def _synthesize_research_to_memo(self, research_data: Dict, company_name: str) -> Dict[str, Section]:

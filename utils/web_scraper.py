@@ -135,53 +135,24 @@ class WebScraper:
         for attempt in range(self.max_retries):
             try:
                 logger.info(f"Fetching {url} (attempt {attempt + 1})")
+                response = self.session.get(url, timeout=10)
+                response.raise_for_status()
                 
-                # Use trafilatura.fetch_url with timeout instead of requests directly
-                try:
-                    downloaded = trafilatura.fetch_url(url, timeout=10)
-                    if not downloaded:
-                        logger.warning(f"Failed to download content from {url}")
-                        return None
-                    
-                    # Extract main content using trafilatura
-                    extracted_text = trafilatura.extract(downloaded, include_comments=False, include_tables=False)
-                    
-                    if not extracted_text:
-                        # Fallback to BeautifulSoup for title
-                        soup = BeautifulSoup(downloaded, 'html.parser')
-                        title = soup.title.string if soup.title else url
-                        extracted_text = soup.get_text(separator=' ', strip=True)
-                    else:
-                        # Get title from trafilatura or fallback
-                        soup = BeautifulSoup(downloaded, 'html.parser')
-                        title = soup.title.string if soup.title else url
-                    
-                except Exception as e:
-                    logger.warning(f"trafilatura failed for {url}: {e}")
-                    # Fallback to requests
-                    response = self.session.get(url, timeout=10)
-                    response.raise_for_status()
-                    
-                    # Extract main content using trafilatura
-                    extracted_text = trafilatura.extract(response.text, include_comments=False, include_tables=False)
-                    
-                    if not extracted_text:
-                        # Fallback to BeautifulSoup for title
-                        soup = BeautifulSoup(response.text, 'html.parser')
-                        title = soup.title.string if soup.title else url
-                        extracted_text = soup.get_text(separator=' ', strip=True)
-                    else:
-                        # Get title from trafilatura or fallback
-                        soup = BeautifulSoup(response.text, 'html.parser')
-                        title = soup.title.string if soup.title else url
+                # Extract main content using trafilatura
+                extracted_text = trafilatura.extract(response.text, include_comments=False, include_tables=False)
+                
+                if not extracted_text:
+                    # Fallback to BeautifulSoup for title
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    title = soup.title.string if soup.title else url
+                    extracted_text = soup.get_text(separator=' ', strip=True)
+                else:
+                    # Get title from trafilatura or fallback
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    title = soup.title.string if soup.title else url
                 
                 # Clean the extracted text
                 cleaned_text = self.text_cleaner.clean_text(extracted_text)
-                
-                # Truncate if too long (prevent GPT token issues)
-                if len(cleaned_text) > 3000:
-                    cleaned_text = cleaned_text[:3000]
-                    logger.info(f"Truncated content from {url} to 3000 chars")
                 
                 # Rate limiting
                 time.sleep(self.rate_limit_delay)

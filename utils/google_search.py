@@ -26,29 +26,20 @@ class GoogleSearcher:
         """Perform Google searches for a company and extract content"""
         results = []
         
-        # Limit to max 5 queries to prevent hanging
-        limited_queries = queries[:5]
-        logger.info(f"Processing {len(limited_queries)} queries for {company_name}")
-        
-        for i, query in enumerate(limited_queries):
+        for query in queries:
             try:
-                logger.info(f"Searching for: {query} ({i+1}/{len(limited_queries)})")
+                logger.info(f"Searching for: {query}")
                 
-                # Perform search with timeout
+                # Perform search
                 search_results = self._perform_search(query)
                 
-                if not search_results:
-                    logger.warning(f"No search results found for query: {query}")
-                    continue
-                
-                # Process top 2 results (reduced from 3)
-                processed_count = 0
-                for result in search_results[:2]:
+                # Process top 3 results
+                for result in search_results[:3]:
                     try:
-                        # Extract content from URL with timeout
+                        # Extract content from URL
                         content = self._extract_content(result['link'])
                         
-                        if content and len(content) > 100:  # Only add if meaningful content
+                        if content:
                             results.append({
                                 "query": query,
                                 "url": result['link'],
@@ -56,22 +47,16 @@ class GoogleSearcher:
                                 "snippet": result.get('snippet', ''),
                                 "text": content
                             })
-                            processed_count += 1
-                            
-                            # Limit to 1 result per query to speed up
-                            if processed_count >= 1:
-                                break
                     
                     except Exception as e:
                         logger.warning(f"Failed to extract content from {result.get('link', '')}: {e}")
                 
                 # Rate limiting
-                time.sleep(1.0)  # Reduced from 1.5
+                time.sleep(1.5)
                 
             except Exception as e:
                 logger.error(f"Failed to search for '{query}': {e}")
         
-        logger.info(f"Completed web search for {company_name}: {len(results)} results")
         return results
     
     def _perform_search(self, query: str, max_retries: int = 3) -> List[Dict]:
