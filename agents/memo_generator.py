@@ -27,7 +27,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.recommendations.citations %}
-**Sources:** {% for citation in company.recommendations.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.recommendations.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ---
@@ -46,7 +46,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.intro.citations %}
-**Sources:** {% for citation in company.intro.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.intro.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 2. Company Overview
@@ -63,7 +63,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.intro.citations %}
-**Sources:** {% for citation in company.intro.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.intro.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 3. Problem
@@ -80,7 +80,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.problem.citations %}
-**Sources:** {% for citation in company.problem.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.problem.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 4. Solution
@@ -97,7 +97,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.solution.citations %}
-**Sources:** {% for citation in company.solution.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.solution.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 5. Product
@@ -114,7 +114,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.product.citations %}
-**Sources:** {% for citation in company.product.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.product.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 6. Business Model
@@ -131,10 +131,10 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.business_model.citations %}
-**Sources:** {% for citation in company.business_model.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.business_model.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
-## 7. Market Size / Opportunity
+## 7. Market Size
 {% if company.market.has_content() %}
 {{ company.market.text }}
 
@@ -148,10 +148,10 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.market.citations %}
-**Sources:** {% for citation in company.market.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.market.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
-## 8. Traction / Milestones
+## 8. Traction
 {% if company.traction.has_content() %}
 {{ company.traction.text }}
 
@@ -165,10 +165,10 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.traction.citations %}
-**Sources:** {% for citation in company.traction.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.traction.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
-## 9. Go-To-Market / Growth Strategy
+## 9. Growth Strategy
 {% if company.growth_strategy.has_content() %}
 {{ company.growth_strategy.text }}
 
@@ -182,7 +182,7 @@ Prepared on {{ date }}
 {% endif %}
 
 {% if company.growth_strategy.citations %}
-**Sources:** {% for citation in company.growth_strategy.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.growth_strategy.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 10. Team
@@ -195,14 +195,14 @@ Prepared on {{ date }}
 {% endfor %}
 {% endif %}
 {% else %}
-The {{ company.name }} leadership team brings relevant industry experience to the company's mission.
+[Team information not provided in pitch deck]
 {% endif %}
 
 {% if company.team.citations %}
-**Sources:** {% for citation in company.team.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.team.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
-## 11. Competitors
+## 11. Competition
 {% if company.competitors.has_content() %}
 {{ company.competitors.text }}
 
@@ -216,7 +216,7 @@ The {{ company.name }} leadership team brings relevant industry experience to th
 {% endif %}
 
 {% if company.competitors.citations %}
-**Sources:** {% for citation in company.competitors.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.competitors.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 12. Financials
@@ -224,7 +224,7 @@ The {{ company.name }} leadership team brings relevant industry experience to th
 {{ company.financials.text }}
 
 {% if company.financials.bullets %}
-**Financial Metrics:**
+**Financial Highlights:**
 {% for bullet in company.financials.bullets %}- {{ bullet }}
 {% endfor %}
 {% endif %}
@@ -233,7 +233,7 @@ The {{ company.name }} leadership team brings relevant industry experience to th
 {% endif %}
 
 {% if company.financials.citations %}
-**Sources:** {% for citation in company.financials.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.financials.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
 ## 13. Risks
@@ -241,69 +241,50 @@ The {{ company.name }} leadership team brings relevant industry experience to th
 {{ company.risks.text }}
 
 {% if company.risks.bullets %}
-**Potential Risk Factors:**
+**Key Risk Factors:**
 {% for bullet in company.risks.bullets %}- {{ bullet }}
 {% endfor %}
 {% endif %}
 {% else %}
-Potential Risk Factors:
-
-- Execution risk in scaling operations
-- Market timing and competitive pressure
-- Regulatory changes in target markets
-- Technology adoption challenges
-- Team scaling and retention
+[Risk assessment not provided in pitch deck]
 {% endif %}
 
 {% if company.risks.citations %}
-**Sources:** {% for citation in company.risks.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.risks.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
-## 14. Why Now
+## 14. Timing
 {% if company.timing.has_content() %}
 {{ company.timing.text }}
 
 {% if company.timing.bullets %}
-**Market Timing Considerations:**
+**Timing Factors:**
 {% for bullet in company.timing.bullets %}- {{ bullet }}
 {% endfor %}
 {% endif %}
 {% else %}
-Market Timing Considerations:
-
-- [Industry] market is experiencing rapid growth
-- Technology adoption is accelerating
-- Regulatory environment is favorable
-- Customer demand is increasing
-- Competitive landscape is evolving
+[Timing analysis not provided in pitch deck]
 {% endif %}
 
 {% if company.timing.citations %}
-**Sources:** {% for citation in company.timing.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.timing.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 
-## 15. Moat / Defensibility
+## 15. Moat
 {% if company.moat.has_content() %}
 {{ company.moat.text }}
 
 {% if company.moat.bullets %}
-**Potential Defensibility Factors:**
+**Competitive Advantages:**
 {% for bullet in company.moat.bullets %}- {{ bullet }}
 {% endfor %}
 {% endif %}
 {% else %}
-Potential Defensibility Factors:
-
-- Network effects from user base
-- Proprietary technology and IP
-- Strong brand recognition
-- Early-mover advantage
-- Data moats and switching costs
-- Strategic partnerships and relationships
+[Competitive moat analysis not provided in pitch deck]
 {% endif %}
 
 {% if company.moat.citations %}
-**Sources:** {% for citation in company.moat.citations %}{% if citation.source_type != "pitch_deck" and citation.source_type != "web_research" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Web Research]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+**Sources:** {% for citation in company.moat.citations %}{% if citation.source_type != "pitch_deck" %}[{{ citation.source_type }}]({{ citation.url }}){% else %}[Pitch Deck]({{ citation.url }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
 """
 

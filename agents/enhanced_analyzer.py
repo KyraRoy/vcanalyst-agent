@@ -520,12 +520,16 @@ class EnhancedAnalyzer:
         """
         logger.info(f"Synthesizing research into memo for {company_name}")
         
-        # Prepare research data for GPT analysis
+        # Prepare research data for GPT analysis and track sources
         research_text = ""
+        source_urls = []  # Track all source URLs
+        
         for query, results in research_data.items():
             research_text += f"\nQuery: {query}\n"
             for result in results[:3]:  # Top 3 results per query
-                research_text += f"Source: {result.get('url', 'Unknown')}\n"
+                url = result.get('url', 'Unknown')
+                source_urls.append(url)  # Track the URL
+                research_text += f"Source: {url}\n"
                 research_text += f"Content: {result.get('text', '')[:500]}...\n\n"
         
         prompt = f"""
@@ -600,20 +604,20 @@ class EnhancedAnalyzer:
                        "bullets": ["List the 5 key financial metrics for {company_name} with specific numbers and funding details."]
                    }},
                    "risks": {{
-                       "text": "Describe the main risks and challenges facing {company_name} including execution, regulatory, market, and competitive risks. Answer in 150+ words with specific risk factors.",
-                       "bullets": ["List the 5 biggest risks for {company_name} with specific risk factors and challenges."]
+                       "text": "Describe the key risks and challenges facing {company_name} including market risks, competitive risks, execution risks, and regulatory risks. Answer in 150+ words with specific concerns.",
+                       "bullets": ["List the 5 biggest risks for {company_name} with specific details about potential challenges."]
                    }},
                    "timing": {{
-                       "text": "Explain why now is the right time for {company_name}, what market conditions and trends make this opportunity timely. Answer in 150+ words with specific timing factors.",
-                       "bullets": ["List the 5 key timing factors that make {company_name} opportunity relevant now with specific market conditions."]
+                       "text": "Describe why now is the right time to invest in {company_name} including market timing, technology readiness, and competitive advantages. Answer in 150+ words with specific timing factors.",
+                       "bullets": ["List the 5 key timing factors for investing in {company_name} with specific market and technology trends."]
                    }},
                    "moat": {{
-                       "text": "Describe {company_name} competitive moat and defensibility, how they protect their market position. Answer in 150+ words with specific defensibility factors.",
-                       "bullets": ["List the 5 key defensibility factors for {company_name} with specific competitive advantages."]
+                       "text": "Describe {company_name} competitive moat and defensibility including network effects, switching costs, brand, and technology advantages. Answer in 150+ words with specific moat characteristics.",
+                       "bullets": ["List the 5 key competitive advantages for {company_name} with specific moat characteristics."]
                    }}
                }}
                
-               Guidelines:
+               Important guidelines:
                - Provide actual answers to each question, not the questions themselves
                - Do NOT use generic templates or placeholder text
                - Get actual facts, numbers, and specific details
@@ -622,7 +626,6 @@ class EnhancedAnalyzer:
                - If information is limited, provide reasonable industry-based insights
                - Include recent news, funding announcements, and current market positioning
                - Provide detailed bullet points with substantial insights, not generic statements
-               - For missing information, provide industry-standard insights or mark as "Limited information available"
                """
         
         try:
@@ -634,7 +637,20 @@ class EnhancedAnalyzer:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a professional VC analyst. Create comprehensive investment memos from web research data."
+                        "content": """You are a professional VC analyst with expertise in investment memo creation. 
+                        Your task is to synthesize web research into structured investment memo sections.
+                        
+                        Focus on:
+                        - Accurate problem/solution identification
+                        - Market size and opportunity analysis
+                        - Team background and credibility
+                        - Traction and financial metrics
+                        - Competitive landscape
+                        - Business model and revenue streams
+                        - Growth strategy and go-to-market
+                        - Risk factors and defensibility
+                        
+                        Be precise, professional, and analytical in your assessment."""
                     },
                     {
                         "role": "user",
@@ -646,11 +662,114 @@ class EnhancedAnalyzer:
             )
             
             content = response.choices[0].message.content.strip()
-            return self._parse_gpt_response(content, company_name)
+            
+            # Parse the structured response
+            sections = self._parse_gpt_response(content, company_name)
+            
+            # Add real citations to each section
+            for section_name, section in sections.items():
+                if section and hasattr(section, 'citations'):
+                    # Create citations from actual source URLs
+                    for url in source_urls:
+                        if url and url != 'Unknown':
+                            # Determine source type based on URL
+                            source_type = self._determine_source_type(url)
+                            citation = Citation(
+                                source_type=source_type,
+                                url=url,
+                                title=f"Source: {source_type}",
+                                timestamp=datetime.now()
+                            )
+                            section.citations.append(citation)
+            
+            logger.info(f"Successfully synthesized {len(sections)} sections with real citations")
+            return sections
             
         except Exception as e:
             logger.error(f"Research synthesis failed: {e}")
             return {}
+    
+    def _determine_source_type(self, url: str) -> str:
+        """Determine the source type based on URL"""
+        url_lower = url.lower()
+        
+        if 'linkedin.com' in url_lower:
+            return 'LinkedIn'
+        elif 'crunchbase.com' in url_lower:
+            return 'Crunchbase'
+        elif 'mckinsey.com' in url_lower:
+            return 'McKinsey Report'
+        elif 'techcrunch.com' in url_lower:
+            return 'TechCrunch'
+        elif 'forbes.com' in url_lower:
+            return 'Forbes'
+        elif 'bloomberg.com' in url_lower:
+            return 'Bloomberg'
+        elif 'wsj.com' in url_lower or 'wallstreetjournal.com' in url_lower:
+            return 'Wall Street Journal'
+        elif 'reuters.com' in url_lower:
+            return 'Reuters'
+        elif 'cnbc.com' in url_lower:
+            return 'CNBC'
+        elif 'venturebeat.com' in url_lower:
+            return 'VentureBeat'
+        elif 'pitchbook.com' in url_lower:
+            return 'PitchBook'
+        elif 'statista.com' in url_lower:
+            return 'Statista'
+        elif 'gartner.com' in url_lower:
+            return 'Gartner'
+        elif 'idc.com' in url_lower:
+            return 'IDC'
+        elif 'bain.com' in url_lower:
+            return 'Bain & Company'
+        elif 'bcg.com' in url_lower:
+            return 'Boston Consulting Group'
+        elif 'deloitte.com' in url_lower:
+            return 'Deloitte'
+        elif 'pwc.com' in url_lower:
+            return 'PwC'
+        elif 'ey.com' in url_lower:
+            return 'EY'
+        elif 'kpmg.com' in url_lower:
+            return 'KPMG'
+        elif 'google.com' in url_lower:
+            return 'Google Search'
+        elif 'youtube.com' in url_lower:
+            return 'YouTube'
+        elif 'twitter.com' in url_lower or 'x.com' in url_lower:
+            return 'Twitter/X'
+        elif 'facebook.com' in url_lower:
+            return 'Facebook'
+        elif 'instagram.com' in url_lower:
+            return 'Instagram'
+        elif 'medium.com' in url_lower:
+            return 'Medium'
+        elif 'substack.com' in url_lower:
+            return 'Substack'
+        elif 'github.com' in url_lower:
+            return 'GitHub'
+        elif 'stackoverflow.com' in url_lower:
+            return 'Stack Overflow'
+        elif 'reddit.com' in url_lower:
+            return 'Reddit'
+        elif 'quora.com' in url_lower:
+            return 'Quora'
+        elif 'wikipedia.org' in url_lower:
+            return 'Wikipedia'
+        elif 'news.ycombinator.com' in url_lower:
+            return 'Hacker News'
+        else:
+            # Extract domain name for unknown sources
+            from urllib.parse import urlparse
+            try:
+                domain = urlparse(url).netloc
+                if domain:
+                    return f"{domain.title()}"
+                else:
+                    return "Web Research"
+            except:
+                return "Web Research"
     
     def _create_comprehensive_memo_from_research(self, memo_sections: Dict[str, Section], company_name: str) -> StructuredCompanyDoc:
         """
